@@ -1,3 +1,8 @@
+'''
+This script scrapes AirBNB properties.  I used this only as an experiment;
+relevant AirBNB data was provided by AirDNA.
+'''
+
 import requests
 import json
 from pprint import pprint

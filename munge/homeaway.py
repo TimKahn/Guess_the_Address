@@ -1,3 +1,8 @@
+'''
+This script reads in Homeaway property data as a .csv, uses googlemaps API reverse geocoding to find the address,
+and pickles the results.
+'''
+
 import pandas as pd
 import os
 import googlemaps

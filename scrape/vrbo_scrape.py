@@ -1,9 +1,13 @@
+'''
+This script scrapes Denver VRBO listings, uses googlemaps API reverse geocoding to find their addresses,
+and saves the results both as a .csv and as a pickle.
+'''
+
 import requests
 import os
 import json
 import pandas as pd
 from pprint import pprint
-# from geopy.geocoders import GoogleV3
 import googlemaps
 import string
 import re
@@ -23,6 +27,7 @@ def get_url(page_num):
     url = "https://www.vrbo.com/ajax/map/results/vacation-rentals/@{sw_lat},{sw_long},{ne_lat},{ne_long},12z?swLat={sw_lat}&swLong={sw_long}&neLat={ne_lat}&neLong={ne_long}&zoom=12&page={page}&region={region}&searchTermContext=9b810827-b5cb-4e59-a1f0-553027e04694&searchTermUuid=9b810827-b5cb-4e59-a1f0-553027e04694&sleeps=1-plus&_=1496211019307".format(**parameters)
 
     '''TEST URLs:
+
     url1 = 'https://www.vrbo.com/ajax/map/results/vacation-rentals/@39.65237457610901,-105.04965595142579,39.826878836475025,-104.93086627857423,12z?swLat=39.65237457610901&swLong=-105.04965595142579&neLat=39.826878836475025&neLong=-104.93086627857423&zoom=12&page=1&region=2332&searchTermContext=9b810827-b5cb-4e59-a1f0-553027e04694&searchTermUuid=9b810827-b5cb-4e59-a1f0-553027e04694&sleeps=1-plus&_=1496211019307'
 
     url2 = 'https://www.vrbo.com/ajax/map/results/vacation-rentals/@39.69280593436666,-105.01515201465821,39.78652608215945,-104.95575717823243,13z?swLat=39.69280593436666&swLong=-105.01515201465821&neLat=39.78652608215945&neLong=-104.95575717823243&zoom=13&page=2&region=2332&searchTermContext=9b810827-b5cb-4e59-a1f0-553027e04694&searchTermUuid=9b810827-b5cb-4e59-a1f0-553027e04694&sleeps=1-plus&_=1496510365866'
@@ -76,6 +81,7 @@ def scrape_all():
             print('Attempting page {}'.format(i))
             url = get_url(i)
             all_properties.extend(get_properties(url))
+            i += 1
         except:
             print('Page {} scrape failed.'.format(i))
             break
@@ -83,3 +89,5 @@ def scrape_all():
 
 if __name__ == '__main__':
     all_results = scrape_all()
+    all_results.to_pickle('../data/vrbo.pkl')
+    all_results.to_csv('../data/vrbo.csv')

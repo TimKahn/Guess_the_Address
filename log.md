@@ -7,4 +7,7 @@
 #### 6.5.2017 Monday
 * Opted to use googlemaps API for geocoding/reverse geocoding to ensure consistency.  Using Place ID for comparisons should work better than lat/lon.
 * Noted duplicate googlemaps place IDs in the VRBO and Homeaway data.  This may require chronological data to resolve.  For now, I'm keeping the duplicates -- better chance of matching a description to AirBNB, and it's possible that different units in a condo would have the same gmaps ID.
-* Dropped non-unique property IDs from VRBO/Homeaway data.
+* Dropped duplicate titles from VRBO/Homeaway data.
+* Dropped duplicate titles from AirBNB data for use in text comparison.
+* Note: I opted to drop titles instead of property IDs; perhaps it's possible to have multiple titles associated with a property?
+* FuzzyWuzzy with simple word ratio to find and score best matches between titles on Homeaway/VRBO and AirBNB.

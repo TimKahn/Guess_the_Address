@@ -11,3 +11,14 @@
 * Dropped duplicate titles from AirBNB data for use in text comparison.
 * Note: I opted to drop titles instead of property IDs; perhaps it's possible to have multiple titles associated with a property?
 * FuzzyWuzzy with simple word ratio to find and score best matches between titles on Homeaway/VRBO and AirBNB.
+
+#### 6.6.2017 Tuesday
+* Find distances between VRBO/Homeaway listings and their matched listings on AirBNB.
+* Manually validate matched listings.
+* Create a function that designates bounds on lat/lon for comparison to an AirBNB listing.
+* Find a test zipcode.  Pull records from Attom.  Geocode via address to get gmaps lat/lon (but: how many records?)
+* Pull Attom records within lat/lon bounds for a single property subject to distance being within 400m (or whatever bounds).
+* Automate for all zipcodes in dataset.
+* Should I only use 'entire home' listings?
+* Possibility that listing is not even within 400m circle!  Example: VRBO 4105204 / AirBNB 1005908
+* Consider using lat/lon differences instead of distance.

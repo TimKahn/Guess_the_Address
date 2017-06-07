@@ -32,5 +32,3 @@
 #### Questions for Dan
 * Extend into 'metro Denver'?
 * Quantify profit of true positive?  Of mechanical turk validation?
-* Exact application of this for AVM?
-* Know anything about licenses?  Could we use them to validate our results?

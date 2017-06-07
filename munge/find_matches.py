@@ -47,13 +47,12 @@ def get_matches(df, df_a):
     print('Searching for matches...')
     matches = []
     for i, row in df.iterrows():
-        title, score, idx = process.extractOne(row['title'], df_a['title'], scorer=fuzz.ratio)
-        if score >= 80:
-            airbnb_coords, other_coords = (df_a.loc[idx, 'latitude'], df_a.loc[idx, 'longitude']), (row['lat'], row['lon'])
-            distance = geopy.distance.vincenty(airbnb_coords, other_coords).km
-            if distance <= .5:
-                matches.append([score, distance, row['service'], row['prop_id'], row['title'], df_a.loc[idx, 'airbnb_property_id'], df_a.loc[idx, 'title'], df_a.loc[idx, 'room_type']])
-    matches = pd.DataFrame(matches, columns=['score', 'distance', 'service', 'id_other', 'title_other', 'airbnb_property_id', 'title_airbnb', 'room_type'])
+        title, score, idx = process.extractOne(row['title'], df_a['title'], scorer=fuzz.ratio) #compare titles using simple word ratio, return best match
+        airbnb_coords, other_coords = (df_a.loc[idx, 'latitude'], df_a.loc[idx, 'longitude']), (row['lat'], row['lon'])
+        lat_diff, lon_diff = airbnb_coords[0] - other_coords[0], airbnb_coords[1] - other_coords[1]
+        distance = geopy.distance.vincenty(airbnb_coords, other_coords).km
+        matches.append([score, distance, lat_diff, lon_diff, row['service'], row['prop_id'], row['title'], df_a.loc[idx, 'airbnb_property_id'], df_a.loc[idx, 'title'], df_a.loc[idx, 'room_type']])
+    matches = pd.DataFrame(matches, columns=['score', 'distance', 'lat_diff', 'lon_diff', 'service', 'id_other', 'title_other', 'airbnb_property_id', 'title_airbnb', 'room_type'])
     matches.sort_values('score', inplace=True, ascending=False)
     matches.drop_duplicates('airbnb_property_id', inplace=True)
     return matches
@@ -62,5 +61,4 @@ if __name__ == '__main__':
     df = combine_data()
     df_a = pd.read_pickle('../data/airbnb_titles.pkl')
     matches = get_matches(df, df_a)
-    matches.to_pickle('../data/matches.pkl')
     matches.to_csv('../data/matches.csv')

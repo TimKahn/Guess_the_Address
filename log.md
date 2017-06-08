@@ -35,3 +35,4 @@
 #### Areas to improve
 * Model is reliant on finding cross-listed properties, which could be too few (esp. outside major cities).  I have code to find the most likely cross-listings,
 and it does fairly well, but they must be manually validated.  I do not want this data to be a prediction, as it would put incorrect data in my tiny positive class!
+* Current MVP trusts the lat, lon in the attom data.

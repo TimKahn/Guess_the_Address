@@ -1,11 +1,9 @@
-'''
-This script reads in Homeaway property data as a .csv, uses googlemaps API reverse geocoding to find the address,
-and pickles the results.
-'''
+#Note: pad latitude by .005, longitude by .0065
 
 import pandas as pd
 import os
 import googlemaps
+import geopy.distance
 import re
 
 gmaps = googlemaps.Client(key=os.environ['GMAPS_GEOLOCATOR'])
@@ -28,15 +26,16 @@ def reverse_geo(lat, lon):
     gmaps_place_id = result['place_id']
     return full_address, street_address, zipcode, gmaps_place_id
 
-def mapper(df):
+def get_location():
+    df = pd.read_csv('../data/matches.csv')
     try:
-        df['full_address'], df['street_address'], df['zipcode'], df['gmaps_place_id'] = reverse_geo(df['latitude'], df['longitude'])
+        df['full_address'], df['street_address'], df['zipcode'], df['gmaps_place_id'] = reverse_geo(df['true_latitude'], df['true_longitude'])
     except:
         df['full_address'], df['street_address'], df['zipcode'], df['gmaps_place_id'] = '', '', 0, ''
+
+    distance = geopy.distance.vincenty(airbnb_coords, true_coords).km
     return df
 
 if __name__ == '__main__':
-    df = pd.read_csv('../data/homeaway_denver.csv')[['homeaway_property_id', 'latitude', 'longitude', 'title', 'geocode_exact']]
-    df = df[df.geocode_exact == True]
-    df = df.apply(mapper, axis=1)
-    df.to_pickle('../data/homeaway.pkl')
+    get_location()
+    # matches = matches.query("match_score >= 85 & distance <= .5 & room_type == 'Entire home/apt'")

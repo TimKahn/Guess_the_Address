@@ -30,5 +30,4 @@
 * Create classes for bootstrapping, various models, etc.  Pickle models and keep log mapping filenames to parameters etc.
 
 #### Questions for Dan
-* Extend into 'metro Denver'?
 * Quantify profit of true positive?  Of mechanical turk validation?

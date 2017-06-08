@@ -58,7 +58,7 @@ def fuzzy_match(title_crosslist, titles_airbnb):
         print('Comparison Failed on {}'.format(title_crosslist))
         return None, 0
 
-def process_data(df_crosslist, df_a):
+def merge_data(df_crosslist, df_a):
     df_crosslist.sort_values('match_score', inplace=True, ascending=False)
     df_crosslist.drop_duplicates('airbnb_property_id', inplace=True)
     df_crosslist = df_crosslist[pd.notnull(df_crosslist['airbnb_property_id'])]
@@ -88,5 +88,5 @@ if __name__ == '__main__':
     # find_matches()
     df_a = pd.read_pickle('../data/df_a.pkl')
     df_crosslist = pd.read_pickle('../data/df_crosslist.pkl')
-    matches = process_data(df_crosslist, df_a)
+    matches = merge_data(df_crosslist, df_a)
     matches.to_csv('../data/matches.csv')

@@ -40,49 +40,49 @@ def combine_data():
     df_all = pd.concat([df_h, df_v], axis=0)
     df_all.drop_duplicates('title_crosslist', inplace=True)
     df_all = df_all[pd.notnull(df_all['title_crosslist'])]
-    df_all.reset_index()
+    df_all.reset_index(drop=True)
     return df_all
 
 def get_airbnb():
     df_a = pd.read_csv('../data/airbnb_denver.csv')
-    df_a.drop_duplicates('title', inplace=True)
+    df_a.drop_duplicates('airbnb_property_id', inplace=True)
     df_a = df_a[pd.notnull(df_a['title'])]
+    df_a.reset_index(drop=True)
     return df_a
 
 def fuzzy_match(title_crosslist, titles_airbnb):
     try:
-        title_crosslist, score, idx = process.extractOne(title_crosslist, titles_airbnb, scorer=fuzz.ratio, score_cutoff=50)
+        title, score, idx = process.extractOne(title_crosslist, titles_airbnb, scorer=fuzz.ratio, score_cutoff=50)
         return idx, score
     except:
         print('Comparison Failed on {}'.format(title_crosslist))
         return None, 0
 
 def process_data(df_crosslist, df_a):
-    df_a.sort_values('score', inplace=True, ascending=False)
-    df_a = df_a[pd.notnull(df_a['idx'])]
-    df_a.drop_duplicates('idx', inplace=True)
-    index_list = df_a['idx']
-    df_crosslist = df_crosslist.loc[index_list, :]
-    return index_list, df_a, df_crosslist
+    df_crosslist.sort_values('match_score', inplace=True, ascending=False)
+    df_crosslist = df_crosslist[pd.notnull(df_crosslist['idx'])]
+    df_crosslist.drop_duplicates('idx', inplace=True)
+    index_list = df_crosslist['idx']
+    return df_a.join(df_crosslist)
 
 def find_matches():
     df_crosslist = combine_data()
     df_a = get_airbnb()
-    titles = df_crosslist['title_crosslist']
+    titles_airbnb = df_a['title']
     idx_list = []
     score_list = []
-    for i, row in df_a.iterrows():
-        idx, score = fuzzy_match(row['title'], titles)
+    for i, row in df_crosslist.iterrows():
+        idx, score = fuzzy_match(row['title_crosslist'], titles_airbnb)
         idx_list.append(idx)
         score_list.append(score)
-    df_a['idx'] = idx_list
-    df_a['score'] = score_list
+    df_crosslist['idx'] = idx_list
+    df_crosslist['match_score'] = score_list
     df_a.to_pickle('../data/df_a.pkl')
     df_crosslist.to_pickle('../data/df_crosslist.pkl')
     return
 
 if __name__ == '__main__':
-    # find_matches()
+    find_matches()
     df_a = pd.read_pickle('../data/df_a.pkl')
     df_crosslist = pd.read_pickle('../data/df_crosslist.pkl')
     index_list, df_a, df_crosslist = process_data(df_crosslist, df_a)

@@ -60,10 +60,10 @@ def fuzzy_match(title_crosslist, titles_airbnb):
 
 def process_data(df_crosslist, df_a):
     df_crosslist.sort_values('match_score', inplace=True, ascending=False)
-    df_crosslist = df_crosslist[pd.notnull(df_crosslist['idx'])]
-    df_crosslist.drop_duplicates('idx', inplace=True)
-    index_list = df_crosslist['idx']
-    return df_a.join(df_crosslist)
+    df_crosslist.drop_duplicates('airbnb_property_id', inplace=True)
+    df_crosslist = df_crosslist[pd.notnull(df_crosslist['airbnb_property_id'])]
+    df_crosslist = df_crosslist[df_crosslist['airbnb_property_id'] != 'bad match']
+    return df_crosslist.merge(df_a, on='airbnb_property_id', how='inner')
 
 def find_matches():
     df_crosslist = combine_data()
@@ -73,17 +73,20 @@ def find_matches():
     score_list = []
     for i, row in df_crosslist.iterrows():
         idx, score = fuzzy_match(row['title_crosslist'], titles_airbnb)
-        idx_list.append(idx)
+        if idx:
+            idx_list.append(df_a.loc[idx, 'airbnb_property_id'])
+        else:
+            idx_list.append('bad match')
         score_list.append(score)
-    df_crosslist['idx'] = idx_list
+    df_crosslist['airbnb_property_id'] = idx_list
     df_crosslist['match_score'] = score_list
     df_a.to_pickle('../data/df_a.pkl')
     df_crosslist.to_pickle('../data/df_crosslist.pkl')
     return
 
 if __name__ == '__main__':
-    find_matches()
+    # find_matches()
     df_a = pd.read_pickle('../data/df_a.pkl')
     df_crosslist = pd.read_pickle('../data/df_crosslist.pkl')
-    index_list, df_a, df_crosslist = process_data(df_crosslist, df_a)
-    # matches.to_csv('../data/matches.csv')
+    matches = process_data(df_crosslist, df_a)
+    matches.to_csv('../data/matches.csv')

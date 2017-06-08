@@ -1,5 +1,3 @@
-#Note: pad latitude by .005, longitude by .0065
-
 import pandas as pd
 import os
 import googlemaps

@@ -13,22 +13,42 @@ AirBNB publishes a good deal of information in its listings, but not the address
 * Tax assessor data via ATTOM.
 
 #### Data processing:
-* Each data point for training/testing models is actually a comparison between an AirBNB property and a property from the tax assessor records.  I only considered 'Entire Home' AirBNB listings.  Labels for each data point are 'match' (1) or 'non-match' (0).  Features:
+Each data point for training/testing is actually a comparison between an AirBNB property and a property from the tax assessor records.  I only considered 'Entire Home' AirBNB listings.  Label for each point is 'match' (1) or 'non-match' (0).  Features:
 ```
-Max similarity score of AirBNB Host Name(s) and First Name on Deed.
+Max similarity score of AirBNB Host Name(s) and First Name on Deed
+Bedrooms on AirBNB listing
 Bedrooms on AirBNB listing - Bedrooms in Assessor Data
+Bathrooms on AirBNB listing
 Bathrooms on AirBNB listing - Bathrooms in Assessor Data
 Difference in latitude (AirBNB minus Tax Assessor)
 Difference in longitude (AirBNB minus Tax Assessor)
+Swimming pool on AirBNB listing
+Swimming pool in tax assessor data
 ```
-* Positive Class (matches): I used a fuzzy finder (FuzzyWuzzy) with word ratio scoring to find most similar listing titles between AirBNB and VRBO/Homeaway.  Word ratio scoring penalizes heavily for even minor variations -- we're looking for very similar listings only.  I kept only those items with a word ratio score of 80 or greater.  These ~170 data points will be manually validated by looking at the web pages for each listing -- the intent is not to predict at this stage, it's to be sure of the locations for the (tiny!) positive class.  With these confirmed matches, I reverse-geocoded the latitudes and longitudes from VRBO/Homeaway to obtain street addresses via Google Maps API.  Finally, I found these addresses in the tax assessor data, and determined the above features.
-* Negative Class: I found every property within 500m of one of the matches (positive class) listed in the tax assessor data, then determined the above features by comparison to the known AirBNB property.  This meant hundreds of non-matches (negative class) for every match.
+
+* **Positive Class (matches):**
+
+ * I used a fuzzy finder (FuzzyWuzzy) with word ratio scoring to find most similar listing titles between AirBNB and VRBO/Homeaway.  Word ratio scoring penalizes heavily for even minor variations -- we're looking for very similar listings only.  I kept only those items with a word ratio score of 80 or greater.  Out of these ~170 data points, questionable matches will be manually discarded -- the intent is not to predict addresses at this stage, it's to be sure of the locations for the (tiny!) positive class.
+
+ * With these confirmed matches, I reverse-geocoded the latitudes and longitudes from VRBO/Homeaway to obtain street addresses via Google Maps API.  Finally, I matched these addresses in the tax assessor data, and determined the model features.
+
+    * Approximately 20% of the VRBO/Homeaway addresses could not be matched to an address in the tax assessor data.  Perhaps the public records are incomplete, or the the location was fudged on the VRBO/Homeaway listing.  Ideally, this discrepancy would be resolved or explained.
+
+
+* **Negative Class (non-matches):**
+
+ * I pulled every property within 500m of one of the matches (positive class) in the tax assessor data, then determined the model features by comparison to the known AirBNB property.  This generated hundreds of non-matches (negative class) for every match.
 
 #### Model Selection:
-* Given the severely imbalanced classes, I'll favor recall over precision, much like fraud detection: even if we have 10 false positives for every true positive, we've turned this needle-in-a-haystack problem in to one that could be solved reasonably via human review.
+
+* Given the severely imbalanced classes, I'll favor recall over precision, much like fraud detection: even if we have ten false positives for every true positive, we've turned this needle-in-a-haystack problem in to one that could be solved reasonably via human review.
+
 * Ideally, the models will be benchmarked via profit curves, with an AirDNA estimate of the profit potential, and cost being based on Mechanical Turk cost to review each case that was predicted positive (match).
+
 * Try random forest, SVMs, and boosting to classify correct matches (positive) vs. bad matches (negative).
-* Experiment with blagging, and possibly additional balanced-boostrap bagged models.
+
+* Experiment with blagging, and possibly additional bagged models generated from balanced bootstrap samples.
+
 * Experiment with anomaly detection and more exotic algorithms for handling imbalanced data.
 
 ## Resources and References:
@@ -45,5 +65,10 @@ Difference in longitude (AirBNB minus Tax Assessor)
 * https://motherboard.vice.com/en_us/article/airbnbs-in-a-hot-legal-mess-with-new-york-and-its-not-going-away
 
 #### Imbalanced Classes:
-* https://svds.com/learning-imbalanced-classes/#ref6
-* https://pdfs.semanticscholar.org/a8ef/5a810099178b70d1490a4e6fc4426b642cde.pdf
+* Fantastic overview by Tom Fawcett -- clearly written, well-visualized, and includes some useful references and jupyter notebook examples!
+ * https://svds.com/learning-imbalanced-classes/#ref6
+
+
+* “Class Imbalance, Redux”. Wallace, Small, Brodley and Trikalinos. IEEE Conf on Data Mining, 2011.
+ * Strong theoretical and empirical justification for undersampling and bagging when facing imbalanced classes:
+ * https://pdfs.semanticscholar.org/a8ef/5a810099178b70d1490a4e6fc4426b642cde.pdf

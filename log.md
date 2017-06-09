@@ -40,3 +40,7 @@
 and it does fairly well, but they must be manually validated.  I do not want this data to be a prediction, as it would put incorrect data in my tiny positive class!
 * Current MVP trusts the lat, lon in the attom data.
 * Company flag or not?  Make this a predictor if included?
+* Some properties are seemingly not in the tax assessor database.
+
+#### Readme add-ons
+* Research fuzzy finders

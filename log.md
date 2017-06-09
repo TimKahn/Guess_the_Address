@@ -32,6 +32,9 @@
 #### 6.8.2017 Thursday
 * Use fuzzy finding (word ratio) on address, and if that doesn't match street number, try nearest in distance.
 
+#### 6.9.2017 Friday
+* Manhattan distance?!?!  Google Maps distance (i.e. traversing blocks)?
+
 #### Questions for Dan
 * Quantify profit of true positive?  Of mechanical turk validation?
 

@@ -29,6 +29,9 @@
 * Combine basic munging, matching in one script, maybe as a class?
 * Create classes for bootstrapping, various models, etc.  Pickle models and keep log mapping filenames to parameters etc.
 
+#### 6.8.2017 Thursday
+* Use fuzzy finding (word ratio) on address, and if that doesn't match street number, try nearest in distance.
+
 #### Questions for Dan
 * Quantify profit of true positive?  Of mechanical turk validation?
 
@@ -36,3 +39,4 @@
 * Model is reliant on finding cross-listed properties, which could be too few (esp. outside major cities).  I have code to find the most likely cross-listings,
 and it does fairly well, but they must be manually validated.  I do not want this data to be a prediction, as it would put incorrect data in my tiny positive class!
 * Current MVP trusts the lat, lon in the attom data.
+* Company flag or not?  Make this a predictor if included?

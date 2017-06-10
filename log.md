@@ -31,16 +31,19 @@
 
 #### 6.8.2017 Thursday
 * Use fuzzy finding (word ratio) on address, and if that doesn't match street number, try nearest in distance.
+* Neighborhood code -- can I match attom/AirBNB?
 
 #### 6.9.2017 Friday
 * Manhattan distance?!?!  Google Maps distance (i.e. traversing blocks)?
+* Flowchart of data munge / bullet points in readme
+* Don't forget calibration!
+* Count proportion of addresses not in attom.
 
 #### Questions for Dan
 * Quantify profit of true positive?  Of mechanical turk validation?
 
 #### Areas to improve
-* Model is reliant on finding cross-listed properties, which could be too few (esp. outside major cities).  I have code to find the most likely cross-listings,
-and it does fairly well, but they must be manually validated.  I do not want this data to be a prediction, as it would put incorrect data in my tiny positive class!
+* Model is reliant on finding cross-listed properties, which could be too few (esp. outside major cities).  I have code to find the most likely cross-listings, and it does fairly well, but they must be manually validated.  I do not want this data to be a prediction, as it would put incorrect data points in my tiny positive class.
 * Current MVP trusts the lat, lon in the attom data.
 * Company flag or not?  Make this a predictor if included?
 * Some properties are seemingly not in the tax assessor database.

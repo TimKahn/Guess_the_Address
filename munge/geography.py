@@ -37,11 +37,8 @@ def get_location(df):
     return df
 
 if __name__ == '__main__':
-    # df = pd.read_csv('../data/matches.csv')
-    # matches = df.apply(get_location, axis=1)
-    # matches.to_csv('../data/matches_geo.csv')
-    matches = pd.read_csv('../data/matches_geo.csv')
+    df = pd.read_csv('../data/matches.csv')
+    matches = df.apply(get_location, axis=1)
     matches.drop_duplicates('gmaps_place_id', inplace=True)
-    matches = matches.query("match_score >= 80 & distance <= .5 & room_type == 'Entire home/apt'")
     matches = matches[pd.notnull(matches['street_address'])]
     matches.to_csv('../data/matches_geo.csv')

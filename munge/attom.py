@@ -28,44 +28,42 @@ def find_in_radius(match, df_near):
     radius = .5
     df_near['distance'] = df_near.apply(lambda row: get_distance(row, match['latitude'], match['longitude']), axis=1)
     df_near['true_distance'] = df_near.apply(lambda row: get_distance(row, match['true_latitude'], match['true_longitude']), axis=1)
-    df_radius = df_near[df_near['distance'] <= radius]
-    return df_radius
+    radius_df = df_near[df_near['distance'] <= radius]
+    return radius_df
 
-def find_true_match(match, df_radius):
-    target = match['street_address'].split()
-    closest = df_radius[df_radius['true_distance'] <= .05]
-    matches = []
-    print('***Target: {}'.format(target))
-    for address in closest['PropertyAddressFull']: #check for matches within 50 meters
+def find_matches(df_row):
+    nearby_df = find_nearby(df_row, tax_df) #find properties +/- lat, lon tolerance to minimize distance calculations...
+    radius_df = find_in_radius(df_row, nearby_df) #then find subset of those properties within 500m
+    closest = radius_df[radius_df['true_distance'] <= .05] #look for true match within 50m of true address -- label this 1 if found.
+    target = df_row['street_address'].split()
+    attom_matches = []
+    print('Target: {}'.format(target))
+    for prop in closest.iterrows(): #check for matches within 50 meters
+        address = prop[1]['PropertyAddressFull']
         if address.split()[0] == target[0]: #check for same street number
             street_name = target[1]
             if len(street_name) == 1: #if target[1] has length 1, it's the direction, so street name is in target[2]
                 street_name == target[2]
             if street_name in address.split():
-                matches.append(address)
-    if len(matches) == 0: #if no exact text matches, try matching the closest property on street number
-        nearest = df_radius.loc[df_radius.true_distance.argmin(), 'PropertyAddressFull']
-        if nearest.split()[0] == target[0]:
-            matches.append(nearest)
-        else: #if nearest property also doesn't match, find the best fuzzy match in the whole 500m radius
-            candidate, score, idx = process.extractOne(match['street_address'], df_radius['PropertyAddressFull'], scorer=fuzz.ratio)
-            if candidate.split()[0] == target[0]:
-                print('YAY!  Fuzzy match {}:'.format(candidate))
-                matches.append(candidate)
-    print('Number of Matches: {}'.format(len(matches)))
-    return
-
-
-def find_all(matches_df, tax_df):
-    for match in matches_df.iterrows():
-        match = match[1]
-        df_near = find_nearby(match, tax_df) #find properties +/- lat, lon tolerance
-        df_radius = find_in_radius(match, df_near) #find properties within 500m
-        find_true_match(match, df_radius)
-    return
+                attom_matches.append(address)
+    if len(attom_matches) == 0: #if no exact text matches, try matching the closest property on street number only
+        nearest_property = radius_df.loc[radius_df.true_distance.argmin()]
+        address = nearest_property['PropertyAddressFull']
+        if address.split()[0] == target[0]:
+            print('***Nearby: {}'.format(address))
+            attom_matches.append(address)
+        # else:
+        #     candidate, score, idx = process.extractOne(match['street_address'], radius_df['PropertyAddressFull'], scorer=fuzz.ratio)
+        #     if candidate.split()[0] == target[0]:
+        #         print('YAY!  Fuzzy match {}:'.format(candidate))
+        #         matches.append(candidate)
+    # not using the above 'else'; fuzzy matching didn't help!
+    print('Number of Matches: {}'.format(len(attom_matches)))
+    return attom_matches
 
 if __name__ == '__main__':
     matches_df = pd.read_csv('../data/matches_geo.csv')
+    matches_df = matches_df.query("match_score >= 50 & distance <= .5 & room_type == 'Entire home/apt'")
     tax_df = pd.read_csv('../data/tax_assessor_denver.csv')
     tax_df = tax_df[tax_df['CompanyFlag'] != 'Y']
-    find_all(matches_df, tax_df)
+    matches_df['attom_matches'] = matches_df.apply(find_matches, axis=1)

@@ -52,7 +52,7 @@ def get_airbnb():
 
 def fuzzy_match(title_crosslist, titles_airbnb):
     try:
-        title, score, idx = process.extractOne(title_crosslist, titles_airbnb, scorer=fuzz.ratio, score_cutoff=50)
+        title, score, idx = process.extractOne(title_crosslist, titles_airbnb, scorer=fuzz.ratio, score_cutoff=40)
         return idx, score
     except:
         print('Comparison Failed on {}'.format(title_crosslist))
@@ -62,7 +62,7 @@ def merge_data(df_crosslist, df_a):
     df_crosslist.sort_values('match_score', inplace=True, ascending=False) #sorting makes manual inspection easier
     df_crosslist.drop_duplicates('airbnb_property_id', inplace=True)
     df_crosslist = df_crosslist[pd.notnull(df_crosslist['airbnb_property_id'])]
-    df_crosslist = df_crosslist[df_crosslist['airbnb_property_id'] != 'bad match']
+    df_crosslist = df_crosslist[df_crosslist['airbnb_property_id'] != 0]
     return df_crosslist.merge(df_a, on='airbnb_property_id', how='inner')
 
 def find_matches():
@@ -72,11 +72,12 @@ def find_matches():
     idx_list = []
     score_list = []
     for i, row in df_crosslist.iterrows():
+        print('Checking {}'.format(row['title_crosslist']))
         idx, score = fuzzy_match(row['title_crosslist'], titles_airbnb)
         if idx:
             idx_list.append(df_a.loc[idx, 'airbnb_property_id'])
         else:
-            idx_list.append('bad match')
+            idx_list.append(0)
         score_list.append(score)
     df_crosslist['airbnb_property_id'] = idx_list
     df_crosslist['match_score'] = score_list
@@ -85,7 +86,7 @@ def find_matches():
     return
 
 if __name__ == '__main__':
-    # find_matches()
+    find_matches()
     df_a = pd.read_pickle('../data/df_a.pkl')
     df_crosslist = pd.read_pickle('../data/df_crosslist.pkl')
     matches = merge_data(df_crosslist, df_a)

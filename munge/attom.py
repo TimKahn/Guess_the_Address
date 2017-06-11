@@ -42,28 +42,28 @@ def find_matches(df_row):
         address = prop[1]['PropertyAddressFull']
         if address.split()[0] == target[0]: #check for same street number
             street_name = target[1]
-            if len(street_name) == 1: #if target[1] has length 1, it's the direction, so street name is in target[2]
+            if len(street_name) == 1: #if target[1] has length 1, it's the direction, so the street name is in target[2]
                 street_name == target[2]
             if street_name in address.split():
                 attom_matches.append(address)
-    if len(attom_matches) == 0: #if no exact text matches, try matching the closest property on street number only
+    if len(attom_matches) == 0: #if no exact text matches, try matching the nearest property based on street number only
         nearest_property = radius_df.loc[radius_df.true_distance.argmin()]
         address = nearest_property['PropertyAddressFull']
         if address.split()[0] == target[0]:
             print('***Nearby: {}'.format(address))
             attom_matches.append(address)
-        # else:
-        #     candidate, score, idx = process.extractOne(match['street_address'], radius_df['PropertyAddressFull'], scorer=fuzz.ratio)
-        #     if candidate.split()[0] == target[0]:
-        #         print('YAY!  Fuzzy match {}:'.format(candidate))
-        #         matches.append(candidate)
-    # not using the above 'else'; fuzzy matching didn't help!
+        else: #if all else fails, try fuzzy-finding an address, but keep it only if street number is identical
+            candidate, score, idx = process.extractOne(match['street_address'], radius_df['PropertyAddressFull'], scorer=fuzz.ratio, score_cutoff=75)
+            if candidate.split()[0] == target[0]:
+                print('YAY!  Fuzzy match: {}'.format(candidate))
+                matches.append(candidate)
     print('Number of Matches: {}'.format(len(attom_matches)))
-    return attom_matches
+    df_row['attom_matches']
+    return df_row
 
 if __name__ == '__main__':
     matches_df = pd.read_csv('../data/matches_geo.csv')
-    matches_df = matches_df.query("match_score >= 50 & distance <= .5 & room_type == 'Entire home/apt'")
+    matches_df = matches_df.query("match_score >= 40 & distance <= .52 & room_type == 'Entire home/apt'")
     tax_df = pd.read_csv('../data/tax_assessor_denver.csv')
     tax_df = tax_df[tax_df['CompanyFlag'] != 'Y']
     matches_df['attom_matches'] = matches_df.apply(find_matches, axis=1)

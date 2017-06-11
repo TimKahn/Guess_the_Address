@@ -29,28 +29,28 @@ def find_in_radius(match, df_near):
     df_near['distance'] = df_near.apply(lambda row: get_distance(row, match['latitude'], match['longitude']), axis=1)
     df_near['true_distance'] = df_near.apply(lambda row: get_distance(row, match['true_latitude'], match['true_longitude']), axis=1)
     df_radius = df_near[df_near['distance'] <= radius]
-    find_true_match(match, df_radius)
     return df_radius
 
 def find_true_match(match, df_radius):
     target = match['street_address'].split()
-    closest = df_radius[df_radius['true_distance'] <= .1]
+    closest = df_radius[df_radius['true_distance'] <= .05]
     matches = []
-    print('Target: {}'.format(target))
-    for address in closest['PropertyAddressFull']:
-        if address.split()[0] == target[0]:
+    print('***Target: {}'.format(target))
+    for address in closest['PropertyAddressFull']: #check for matches within 50 meters
+        if address.split()[0] == target[0]: #check for same street number
             street_name = target[1]
-            if len(street_name) == 1:
+            if len(street_name) == 1: #if target[1] has length 1, it's the direction, so street name is in target[2]
                 street_name == target[2]
             if street_name in address.split():
                 matches.append(address)
-    if len(matches) == 0:
-        nearest = closest.loc[closest.true_distance.argmin(), 'PropertyAddressFull']
+    if len(matches) == 0: #if no exact text matches, try matching the closest property on street number
+        nearest = df_radius.loc[df_radius.true_distance.argmin(), 'PropertyAddressFull']
         if nearest.split()[0] == target[0]:
             matches.append(nearest)
-        else:
-            candidate = process.extractOne(match['street_address'], closest['PropertyAddressFull'], scorer=fuzz.ratio)[0]
+        else: #if nearest property also doesn't match, find the best fuzzy match in the whole 500m radius
+            candidate, score, idx = process.extractOne(match['street_address'], df_radius['PropertyAddressFull'], scorer=fuzz.ratio)
             if candidate.split()[0] == target[0]:
+                print('YAY!  Fuzzy match {}:'.format(candidate))
                 matches.append(candidate)
     print('Number of Matches: {}'.format(len(matches)))
     return

@@ -59,7 +59,7 @@ def fuzzy_match(title_crosslist, titles_airbnb):
         return None, 0
 
 def merge_data(df_crosslist, df_a):
-    df_crosslist.sort_values('match_score', inplace=True, ascending=False)
+    df_crosslist.sort_values('match_score', inplace=True, ascending=False) #sorting makes manual inspection easier
     df_crosslist.drop_duplicates('airbnb_property_id', inplace=True)
     df_crosslist = df_crosslist[pd.notnull(df_crosslist['airbnb_property_id'])]
     df_crosslist = df_crosslist[df_crosslist['airbnb_property_id'] != 'bad match']

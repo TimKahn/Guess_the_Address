@@ -1,6 +1,7 @@
 import pandas as pd
 import geopy.distance
 from fuzzywuzzy import fuzz, process
+import re
 
 def get_distance(row, lat, lon):
     '''
@@ -75,9 +76,25 @@ def find_matches(df_row):
     df_row['number_of_matches'] = len(attom_matches)
     return df_row
 
+def parse_names(df_row):
+    if any(re.findall(r'&amp|\Wand', df_row['first_name'], re.IGNORECASE)):
+        names = df_row['first_name'].split()
+        df_row['first_name2'] = names[2]
+        df_row['first_name'] = names[0]
+    return df_row
+
+def get_host_names(airbnb_df):
+    hosts_df = pd.read_csv('../data/denver_hosts.csv')
+    hosts_df = hosts_df[['airbnb_host_id', 'first_name']]
+    airbnb_df = airbnb_df.merge(hosts_df, on='airbnb_host_id', how='left')
+    airbnb_df['first_name'].fillna('', inplace=True)
+    airbnb_df = airbnb_df.apply(parse_names, axis=1)
+    airbnb_df['first_name2'].fillna('', inplace=True)
+    return airbnb_df
+
 def merge_relevant(airbnb_df, tax_df):
     cols_a = ['airbnb_property_id', 'match_score', 'true_latitude', 'true_longitude',
-       'prop_id_crosslist', 'title_crosslist', 'crosslisted_on',  'airbnb_host_id', 'latitude', 'longitude', 'description', 'title',
+       'prop_id_crosslist', 'title_crosslist', 'crosslisted_on',  'airbnb_host_id', 'first_name', 'first_name2', 'latitude', 'longitude', 'description', 'title',
        'property_type', 'bedrooms', 'bathrooms', 'accomodates', 'pets_allowed', 'aircon', 'heating', 'elevator', 'pool', 'gym', 'indoor_fireplace', 'full_address', 'street_address',
        'zipcode', 'gmaps_place_id', 'lat_diff', 'lon_diff', 'distance',
        'attom_matches']
@@ -89,17 +106,24 @@ def merge_relevant(airbnb_df, tax_df):
        'CompanyFlag', 'AreaBuilding', 'BathCount',
        'BedroomsCount', 'HVACCoolingDetail', 'HVACHeatingDetail', 'Fireplace',
        'Pool']
+    airbnb_df = get_host_names(airbnb_df)
     df_a = airbnb_df.loc[:, cols_a]
     df_a['[ATTOM ID]'] = df_a['attom_matches'].apply(lambda x: x[0])
     df_t = tax_df.loc[:, cols_t]
     return df_a.merge(df_t, on='[ATTOM ID]', how='inner')
 
+def append_neighbors(merged_df, tax_df):
+    '''Create a dataframe in the radius of each property.  Give it the AirBNB property id,
+    then try to merge to append rows.  May need to identify merged df as matches first!
+    '''
+    pass
+
 if __name__ == '__main__':
     # matches_df = pd.read_csv('../data/matches_geo.csv')
     # matches_df = matches_df.query("match_score >= 40 & distance <= .55 & room_type == 'Entire home/apt'")
     # print('NUMBER OF POTENTIAL MATCHES: {}'.format(matches_df.shape[0]))
-    # tax_df = pd.read_csv('../data/tax_assessor_denver.csv')
-    # tax_df = tax_df[tax_df['CompanyFlag'] != 'Y']
+    tax_df = pd.read_csv('../data/tax_assessor_denver.csv')
+    tax_df = tax_df.loc[tax_df['CompanyFlag'] != 'Y'] #consider dropping this restriction -- use as predictor?
     # matches_df = matches_df.apply(find_matches, axis=1)
     # non_matches = matches_df.loc[matches_df['number_of_matches']==0]
     # single_matches = matches_df.loc[matches_df['number_of_matches']==1]

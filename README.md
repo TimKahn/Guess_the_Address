@@ -14,14 +14,14 @@ AirBNB publishes a good deal of information in its listings, but not the address
 
  * Data was scraped by noting that searching by moving the map generates a JSON object, which in turn specifies the updated map.  Iterate through some parameters in the URL for the JSON, and voila, you've got data for the entire city.  See [Ian London's Blog.](https://ianlondon.github.io/blog/web-scraping-discovering-hidden-apis/)
 
-
 * Similar data from Homeaway, provided by AirDNA.
 * Tax assessor data via ATTOM.
 
 ### Data Processing
 Each data point for training/testing is actually a comparison between an AirBNB property and a property from the tax assessor records.  I only considered 'Entire Home' AirBNB listings.  I classify each data point as a 'match' (1) or a 'non-match' (0).  Features:
 ```
-Zipcode
+Number of 'neighbors' in radius
+Has unit number
 Air Conditioning
 Heating
 Fireplace

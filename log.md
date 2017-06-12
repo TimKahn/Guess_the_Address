@@ -37,7 +37,7 @@
 #### 6.11.2017 Sunday
 * Initial pool of 185 match candidates, score >= 40, distance <= .55.
  * 52 unmatched, 17 'multi-matched' and need to be manually validated.
- * Try without restriction on company flag...
+* Try without restriction on company flag...
 
 #### Questions for Dan
 * Quantify profit of true positive?  Of mechanical turk validation?
@@ -53,6 +53,7 @@
 * Some listings have inaccurate addresses.
 * Should probably use Google Maps API to geocode all of attom data.  Maybe just missing lat/lon or zipcode records...
  * Also check out GeoQuality from ATTOM.
+* Would it be reasonable to check host 'first names' for company names?
 
 #### Readme add-ons
 * Research fuzzy finders

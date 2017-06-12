@@ -110,23 +110,25 @@ def process_validated(airbnb_df):
     df_a['match'] = 1
     return df_a.merge(tax_df, on='[ATTOM ID]', how='inner')
 
-def append_neighbors(airbnb_df, tax_df):
-    '''Create a dataframe in the radius of each property.  Give it the AirBNB property id,
-    then try to merge to append rows.
-    '''
-    new_df = pd.DataFrame([])
+def process_airbnb(airbnb_df):
+    cols_a = ['airbnb_property_id', 'match_score', 'true_latitude', 'true_longitude',
+       'prop_id_crosslist', 'title_crosslist', 'crosslisted_on',  'airbnb_host_id', 'first_name', 'first_name2', 'latitude', 'longitude', 'description', 'title',
+       'property_type', 'bedrooms', 'bathrooms', 'accomodates', 'pets_allowed', 'aircon', 'heating', 'elevator', 'pool', 'gym', 'indoor_fireplace', 'full_address', 'street_address', 'zipcode', 'gmaps_place_id', 'lat_diff', 'lon_diff', 'listing_distance', 'true_distance', 'attom_matches']
+    airbnb_df = get_host_names(airbnb_df)
+    airbnb_df = airbnb_df.loc[:, cols_a]
+    airbnb_df['attom_id'] = airbnb_df['attom_matches'].apply(lambda x: x[0])
+    return airbnb_df
 
+def append_neighbors(airbnb_df, tax_df):
+    new_df = pd.DataFrame([])
     for idx, row in airbnb_df.iterrows():
-        row_id = row['[ATTOM ID]']
         print(row['title'])
         nearby_df = find_nearby(row, tax_df) #find properties +/- lat, lon tolerance to minimize distance calculations...
         radius_df = find_in_radius(row, nearby_df) #then find the subset of those properties within 500m
-        # radius_df.drop(radius_df[radius_df['[ATTOM ID]'] == row_id], inplace=True)
-        radius_df['airbnb_property_id'] = row['airbnb_property_id']
-        radius_df = airbnb_df.merge(radius_df, on='airbnb_property_id', how='left')
-        radius_df['match'] = 0
+        radius_df['airbnb_property_id'] = row.loc['airbnb_property_id']
+        radius_df['MATCH'] = radius_df['[ATTOM ID]'].apply(lambda x: x == row['attom_id'])
         new_df = new_df.append(radius_df)
-        # airbnb_df = airbnb_df.append(radius_df)
+    new_df = new_df.merge(airbnb_df, on='airbnb_property_id', how='left')
     return new_df
 
 if __name__ == '__main__':
@@ -143,6 +145,7 @@ if __name__ == '__main__':
     # multi_matches = matches_df.loc[matches_df['number_of_matches']>1]
     # single_matches.to_pickle('../data/single_matches.pkl')
 
-    single_matches = pd.read_pickle('../data/single_matches.pkl')
-    matches_df = process_validated(single_matches)
-    final_df = append_neighbors(merged_df, tax_df)
+    validated_matches = pd.read_pickle('../data/single_matches.pkl')
+    validated_matches = process_airbnb(validated_matches)
+    merged_data = append_neighbors(validated_matches, tax_df)
+    merged_data.to_csv('../data/merged.csv')

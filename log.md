@@ -35,8 +35,8 @@
 * Don't forget calibration!
 
 #### 6.11.2017 Sunday
-* Initial pool of 185 match candidates, score >= 40, distance <= .55.
- * 52 unmatched, 17 'multi-matched' and need to be manually validated.
+* Initial pool of 185 match candidates, score >= 40, distance <= .51.
+ * 116 with one match, 52 unmatched, 17 'multi-matched' and need to be manually validated.
 * Try without restriction on company flag...
 
 #### Questions for Dan

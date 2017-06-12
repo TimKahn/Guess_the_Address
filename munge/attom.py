@@ -96,14 +96,6 @@ def process_validated(airbnb_df):
     cols_a = ['airbnb_property_id', 'match_score', 'true_latitude', 'true_longitude',
        'prop_id_crosslist', 'title_crosslist', 'crosslisted_on',  'airbnb_host_id', 'first_name', 'first_name2', 'latitude', 'longitude', 'description', 'title',
        'property_type', 'bedrooms', 'bathrooms', 'accomodates', 'pets_allowed', 'aircon', 'heating', 'elevator', 'pool', 'gym', 'indoor_fireplace', 'full_address', 'street_address', 'zipcode', 'gmaps_place_id', 'lat_diff', 'lon_diff', 'listing_distance', 'true_distance', 'attom_matches']
-    # cols_t = ['[ATTOM ID]', 'Propert''PartyOwner1NameFull', 'PartyOwner2NameFull',
-    #    'PartyOwner3NameFull', 'DeedOwner1NameFull', 'DeedOwner2NameFull',
-    #    'DeedOwner3NameFull', 'DeedOwner4NameFull', 'PartyOwner1NameFirst',
-    #    'PartyOwner2NameFirst', 'PartyOwner3NameFirst', 'DeedOwner1NameFirst',
-    #    'DeedOwner2NameFirst', 'DeedOwner3NameFirst', 'DeedOwner4NameFirst',
-    #    'CompanyFlag', 'AreaBuilding', 'BathCount',
-    #    'BedroomsCount', 'HVACCoolingDetail', 'HVACHeatingDetail', 'Fireplace',
-    #    'Pool']
     airbnb_df = get_host_names(airbnb_df)
     df_a = airbnb_df.loc[:, cols_a]
     df_a['[ATTOM ID]'] = df_a['attom_matches'].apply(lambda x: x[0])
@@ -127,6 +119,7 @@ def append_neighbors(airbnb_df, tax_df):
         radius_df = find_in_radius(row, nearby_df) #then find the subset of those properties within 500m
         radius_df['airbnb_property_id'] = row.loc['airbnb_property_id']
         radius_df['MATCH'] = radius_df['[ATTOM ID]'].apply(lambda x: x == row['attom_id'])
+        radius_df['neighbor_count'] = radius_df.shape[0]
         new_df = new_df.append(radius_df)
     new_df = new_df.merge(airbnb_df, on='airbnb_property_id', how='left')
     return new_df

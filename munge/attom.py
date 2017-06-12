@@ -27,9 +27,9 @@ def find_nearby(match, df):
 
 def find_in_radius(match, df_near):
     radius = .51
-    df_near['distance'] = df_near.apply(lambda row: get_distance(row, match['latitude'], match['longitude']), axis=1)
+    df_near['listing_distance'] = df_near.apply(lambda row: get_distance(row, match['latitude'], match['longitude']), axis=1)
     df_near['true_distance'] = df_near.apply(lambda row: get_distance(row, match['true_latitude'], match['true_longitude']), axis=1)
-    radius_df = df_near[df_near['distance'] <= radius]
+    radius_df = df_near[df_near['listing_distance'] <= radius]
     return radius_df
 
 def test_address(address, target):
@@ -92,51 +92,57 @@ def get_host_names(airbnb_df):
     airbnb_df['first_name2'].fillna('', inplace=True)
     return airbnb_df
 
-def merge_relevant(airbnb_df, tax_df):
+def process_validated(airbnb_df):
     cols_a = ['airbnb_property_id', 'match_score', 'true_latitude', 'true_longitude',
        'prop_id_crosslist', 'title_crosslist', 'crosslisted_on',  'airbnb_host_id', 'first_name', 'first_name2', 'latitude', 'longitude', 'description', 'title',
-       'property_type', 'bedrooms', 'bathrooms', 'accomodates', 'pets_allowed', 'aircon', 'heating', 'elevator', 'pool', 'gym', 'indoor_fireplace', 'full_address', 'street_address', 'zipcode', 'gmaps_place_id', 'lat_diff', 'lon_diff', 'distance', 'attom_matches']
-    cols_t = ['[ATTOM ID]', 'PartyOwner1NameFull', 'PartyOwner2NameFull',
-       'PartyOwner3NameFull', 'DeedOwner1NameFull', 'DeedOwner2NameFull',
-       'DeedOwner3NameFull', 'DeedOwner4NameFull', 'PartyOwner1NameFirst',
-       'PartyOwner2NameFirst', 'PartyOwner3NameFirst', 'DeedOwner1NameFirst',
-       'DeedOwner2NameFirst', 'DeedOwner3NameFirst', 'DeedOwner4NameFirst',
-       'CompanyFlag', 'AreaBuilding', 'BathCount',
-       'BedroomsCount', 'HVACCoolingDetail', 'HVACHeatingDetail', 'Fireplace',
-       'Pool']
+       'property_type', 'bedrooms', 'bathrooms', 'accomodates', 'pets_allowed', 'aircon', 'heating', 'elevator', 'pool', 'gym', 'indoor_fireplace', 'full_address', 'street_address', 'zipcode', 'gmaps_place_id', 'lat_diff', 'lon_diff', 'listing_distance', 'true_distance', 'attom_matches']
+    # cols_t = ['[ATTOM ID]', 'Propert''PartyOwner1NameFull', 'PartyOwner2NameFull',
+    #    'PartyOwner3NameFull', 'DeedOwner1NameFull', 'DeedOwner2NameFull',
+    #    'DeedOwner3NameFull', 'DeedOwner4NameFull', 'PartyOwner1NameFirst',
+    #    'PartyOwner2NameFirst', 'PartyOwner3NameFirst', 'DeedOwner1NameFirst',
+    #    'DeedOwner2NameFirst', 'DeedOwner3NameFirst', 'DeedOwner4NameFirst',
+    #    'CompanyFlag', 'AreaBuilding', 'BathCount',
+    #    'BedroomsCount', 'HVACCoolingDetail', 'HVACHeatingDetail', 'Fireplace',
+    #    'Pool']
     airbnb_df = get_host_names(airbnb_df)
     df_a = airbnb_df.loc[:, cols_a]
     df_a['[ATTOM ID]'] = df_a['attom_matches'].apply(lambda x: x[0])
     df_a['match'] = 1
-    df_t = tax_df.loc[:, cols_t]
-    return df_a.merge(df_t, on='[ATTOM ID]', how='inner')
+    return df_a.merge(tax_df, on='[ATTOM ID]', how='inner')
 
 def append_neighbors(airbnb_df, tax_df):
     '''Create a dataframe in the radius of each property.  Give it the AirBNB property id,
     then try to merge to append rows.
     '''
+    new_df = pd.DataFrame([])
+
     for idx, row in airbnb_df.iterrows():
         row_id = row['[ATTOM ID]']
+        print(row['title'])
         nearby_df = find_nearby(row, tax_df) #find properties +/- lat, lon tolerance to minimize distance calculations...
         radius_df = find_in_radius(row, nearby_df) #then find the subset of those properties within 500m
-        radius_df.drop('[ATTOM ID]' == row_id, inplace=True)
+        # radius_df.drop(radius_df[radius_df['[ATTOM ID]'] == row_id], inplace=True)
         radius_df['airbnb_property_id'] = row['airbnb_property_id']
         radius_df = airbnb_df.merge(radius_df, on='airbnb_property_id', how='left')
         radius_df['match'] = 0
-        airbnb_df = airbnb_df.append(radius_df)
-    return airbnb_df
+        new_df = new_df.append(radius_df)
+        # airbnb_df = airbnb_df.append(radius_df)
+    return new_df
 
 if __name__ == '__main__':
     # matches_df = pd.read_csv('../data/matches_geo.csv')
     # matches_df = matches_df.query("match_score >= 40 & distance <= .51 & room_type == 'Entire home/apt'")
     # print('NUMBER OF POTENTIAL MATCHES: {}'.format(matches_df.shape[0]))
+
     tax_df = pd.read_csv('../data/tax_assessor_denver.csv')
     tax_df = tax_df.loc[tax_df['CompanyFlag'] != 'Y'] #consider dropping this restriction -- use as predictor?
+
     # matches_df = matches_df.apply(find_matches, axis=1)
     # non_matches = matches_df.loc[matches_df['number_of_matches']==0]
     # single_matches = matches_df.loc[matches_df['number_of_matches']==1]
     # multi_matches = matches_df.loc[matches_df['number_of_matches']>1]
     # single_matches.to_pickle('../data/single_matches.pkl')
+
     single_matches = pd.read_pickle('../data/single_matches.pkl')
-    merged_df = merge_relevant(single_matches, tax_df)
+    matches_df = process_validated(single_matches)
     final_df = append_neighbors(merged_df, tax_df)

@@ -19,9 +19,14 @@ AirBNB publishes a good deal of information in its listings, but not the address
 * Tax assessor data via ATTOM.
 
 ### Data Processing
-Each data point for training/testing is actually a comparison between an AirBNB property and a property from the tax assessor records.  I only considered 'Entire Home' AirBNB listings.  Label for each point is 'match' (1) or 'non-match' (0).  Features:
+Each data point for training/testing is actually a comparison between an AirBNB property and a property from the tax assessor records.  I only considered 'Entire Home' AirBNB listings.  I classify each data point as a 'match' (1) or a 'non-match' (0).  Features:
 ```
-Max similarity score of AirBNB Host Name(s) and First Name on Deed
+Zipcode
+Air Conditioning
+Heating
+Fireplace
+Pets, elevator, pool, gym
+Similarity scores of AirBNB Host Name(s) and First Name on Deed etc. (each score is different predictor)
 Bedrooms on AirBNB listing
 Bedrooms on AirBNB listing - Bedrooms in Assessor Data
 Bathrooms on AirBNB listing

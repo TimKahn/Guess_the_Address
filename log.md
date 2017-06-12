@@ -29,24 +29,32 @@
 * Combine basic munging, matching in one script, maybe as a class?
 * Create classes for bootstrapping, various models, etc.  Pickle models and keep log mapping filenames to parameters etc.
 
-#### 6.8.2017 Thursday
-* Use fuzzy finding (word ratio) on address, and if that doesn't match street number, try nearest in distance.
-* Neighborhood code -- can I match attom/AirBNB?
-
 #### 6.9.2017 Friday
 * Manhattan distance?!?!  Google Maps distance (i.e. traversing blocks)?
 * Flowchart of data munge / bullet points in readme
 * Don't forget calibration!
-* Count proportion of addresses not in attom.
+
+#### 6.11.2017 Sunday
+* Initial pool of 185 match candidates, score >= 40, distance <= .55.
+ * 52 unmatched, 17 'multi-matched' and need to be manually validated.
+ * Try without restriction on company flag...
 
 #### Questions for Dan
 * Quantify profit of true positive?  Of mechanical turk validation?
+* Any ideas for properties not in attom database?
+* Any way to bring the boundary into the AirBNB data?
 
 #### Areas to improve
-* Model is reliant on finding cross-listed properties, which could be too few (esp. outside major cities).  I have code to find the most likely cross-listings, and it does fairly well, but they must be manually validated.  I do not want this data to be a prediction, as it would put incorrect data points in my tiny positive class.
+* Model is reliant on finding cross-listed properties, which could be too few to train a model (esp. outside major cities).  I have code to find the most likely cross-listings, and it does fairly well, but they must be manually validated.  I do not want this data to be a prediction, as it would put incorrect data points in my tiny positive class.
 * Current MVP trusts the lat, lon in the attom data.
+* I exclude private room listings from this model.
 * Company flag or not?  Make this a predictor if included?
-* Some properties are seemingly not in the tax assessor database.
+* Some properties are seemingly not in the tax assessor database.  What proportion?  Is there any remedy?
+* Some listings have inaccurate addresses.
+* Should probably use Google Maps API to geocode all of attom data.  Maybe just missing lat/lon or zipcode records...
+ * Also check out GeoQuality from ATTOM.
 
 #### Readme add-ons
 * Research fuzzy finders
+* Describe what VRBO and ATTOM are.
+* Learn more about tax assessor data, licensing, and privacy issues.

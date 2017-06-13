@@ -92,20 +92,10 @@ def get_host_names(airbnb_df):
     airbnb_df['first_name2'].fillna('', inplace=True)
     return airbnb_df
 
-def process_validated(airbnb_df):
-    cols_a = ['airbnb_property_id', 'match_score', 'true_latitude', 'true_longitude',
-       'prop_id_crosslist', 'title_crosslist', 'crosslisted_on',  'airbnb_host_id', 'first_name', 'first_name2', 'latitude', 'longitude', 'description', 'title',
-       'property_type', 'bedrooms', 'bathrooms', 'accomodates', 'pets_allowed', 'aircon', 'heating', 'elevator', 'pool', 'gym', 'indoor_fireplace', 'full_address', 'street_address', 'zipcode', 'gmaps_place_id', 'lat_diff', 'lon_diff', 'listing_distance', 'true_distance', 'attom_matches']
-    airbnb_df = get_host_names(airbnb_df)
-    df_a = airbnb_df.loc[:, cols_a]
-    df_a['[ATTOM ID]'] = df_a['attom_matches'].apply(lambda x: x[0])
-    df_a['match'] = 1
-    return df_a.merge(tax_df, on='[ATTOM ID]', how='inner')
-
 def process_airbnb(airbnb_df):
     cols_a = ['airbnb_property_id', 'match_score', 'true_latitude', 'true_longitude',
        'prop_id_crosslist', 'title_crosslist', 'crosslisted_on',  'airbnb_host_id', 'first_name', 'first_name2', 'latitude', 'longitude', 'description', 'title',
-       'property_type', 'bedrooms', 'bathrooms', 'accomodates', 'pets_allowed', 'aircon', 'heating', 'elevator', 'pool', 'gym', 'indoor_fireplace', 'full_address', 'street_address', 'zipcode', 'gmaps_place_id', 'lat_diff', 'lon_diff', 'listing_distance', 'true_distance', 'attom_matches']
+       'property_type', 'bedrooms', 'bathrooms', 'accomodates', 'pets_allowed', 'aircon', 'heating', 'elevator', 'pool', 'gym', 'indoor_fireplace', 'full_address', 'street_address', 'zipcode', 'gmaps_place_id', 'listing_distance', 'attom_matches']
     airbnb_df = get_host_names(airbnb_df)
     airbnb_df = airbnb_df.loc[:, cols_a]
     airbnb_df['attom_id'] = airbnb_df['attom_matches'].apply(lambda x: x[0])

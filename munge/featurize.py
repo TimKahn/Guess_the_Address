@@ -25,6 +25,7 @@ def get_features(df):
     featurized_df['airbnb_host_id'] = df['airbnb_host_id']
     featurized_df['first_name'] = df['first_name']
     featurized_df['first_name2'] = df['first_name2']
+    pass
 
 if __name__ == '__main__':
     df = pd.read_csv('../data/merged.csv')

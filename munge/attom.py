@@ -27,9 +27,9 @@ def find_nearby(match, df):
 
 def find_in_radius(match, df_near):
     radius = .51
-    df_near['listing_distance'] = df_near.apply(lambda row: get_distance(row, match['latitude'], match['longitude']), axis=1)
+    df_near['distance'] = df_near.apply(lambda row: get_distance(row, match['latitude'], match['longitude']), axis=1)
     df_near['true_distance'] = df_near.apply(lambda row: get_distance(row, match['true_latitude'], match['true_longitude']), axis=1)
-    radius_df = df_near[df_near['listing_distance'] <= radius]
+    radius_df = df_near[df_near['distance'] <= radius]
     return radius_df
 
 def test_address(address, target):
@@ -95,7 +95,7 @@ def get_host_names(airbnb_df):
 def process_airbnb(airbnb_df):
     cols_a = ['airbnb_property_id', 'match_score', 'true_latitude', 'true_longitude',
        'prop_id_crosslist', 'title_crosslist', 'crosslisted_on',  'airbnb_host_id', 'first_name', 'first_name2', 'latitude', 'longitude', 'description', 'title',
-       'property_type', 'bedrooms', 'bathrooms', 'accomodates', 'pets_allowed', 'aircon', 'heating', 'elevator', 'pool', 'gym', 'indoor_fireplace', 'full_address', 'street_address', 'zipcode', 'gmaps_place_id', 'listing_distance', 'attom_matches']
+       'property_type', 'bedrooms', 'bathrooms', 'accomodates', 'pets_allowed', 'aircon', 'heating', 'elevator', 'pool', 'gym', 'indoor_fireplace', 'full_address', 'street_address', 'zipcode', 'gmaps_place_id', 'distance', 'attom_matches']
     airbnb_df = get_host_names(airbnb_df)
     airbnb_df = airbnb_df.loc[:, cols_a]
     airbnb_df['attom_id'] = airbnb_df['attom_matches'].apply(lambda x: x[0])

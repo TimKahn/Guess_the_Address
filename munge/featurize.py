@@ -1,8 +1,10 @@
 import pandas as pd
+import geopy.distance
 
 '''FEATURES:
-Number of 'neighbors' in radius
-Has unit number
+lat_offset: Difference in latitude (AirBNB minus Tax Assessor)
+lon_offset: Difference in longitude (AirBNB minus Tax Assessor)
+neighbor_count: Number of 'neighbors' in radius
 Air Conditioning
 Heating
 Fireplace
@@ -12,20 +14,23 @@ Bedrooms on AirBNB listing
 Bedrooms on AirBNB listing - Bedrooms in Assessor Data
 Bathrooms on AirBNB listing
 Bathrooms on AirBNB listing - Bathrooms in Assessor Data
-Difference in latitude (AirBNB minus Tax Assessor)
-Difference in longitude (AirBNB minus Tax Assessor)
 Swimming pool on AirBNB listing
 Swimming pool in tax assessor data
+Has unit number
 '''
 
 def get_features(df):
     featurized_df = pd.DataFrame([])
-    featurized_df['attom_id'] = df['[ATTOM ID]']
-    featurized_df['airbnb_property_id'] = df['airbnb_property_id']
-    featurized_df['airbnb_host_id'] = df['airbnb_host_id']
-    featurized_df['first_name'] = df['first_name']
-    featurized_df['first_name2'] = df['first_name2']
-    pass
+    featurized_df['attom_id'] = df.loc[:, '[ATTOM ID]']
+    featurized_df['airbnb_property_id'] = df.loc[:, 'airbnb_property_id']
+    featurized_df['airbnb_host_id'] = df.loc[:, 'airbnb_host_id']
+    featurized_df['first_name'] = df.loc[:, 'first_name']
+    featurized_df['first_name2'] = df.loc[:, 'first_name2']
+    featurized_df['lat_offset'] = df.loc[:, 'latitude'] - df.loc[:, 'PropertyLatitude']
+    featurized_df['lon_offset'] = df.loc[:, 'longitude'] - df.loc[:, 'PropertyLongitude']
+    featurized_df['neighbor_count'] = df.loc[:, 'neighbor_count']
+    return featurized_df
 
 if __name__ == '__main__':
     df = pd.read_csv('../data/merged.csv')
+    featurized_df = get_features(df)

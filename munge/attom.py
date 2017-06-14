@@ -79,6 +79,7 @@ def find_matches(df_row):
 def parse_names(df_row):
     if any(re.findall(r'&amp|\Wand', df_row['first_name'], re.IGNORECASE)):
         names = df_row['first_name'].split()
+        print(names)
         df_row['first_name2'] = names[2]
         df_row['first_name'] = names[0]
     return df_row

@@ -42,14 +42,21 @@
 #### 6.12.2017 Monday
 * Average of 989(!) properties in each circle.
 
+#### 6.13.2017 Tuesday
+* Assuming that separate binaries are better.
+
+#### Visuals
+* Scatter plot - indoor fireplace
+* Plot bedrooms vs. bed difference, bathrooms vs. bath difference -- with regression lines?
+
 #### Questions for Dan
+* Airbnb - Accommodates
 * Quantify profit of true positive?  Of mechanical turk validation?
 * Any ideas for properties not in attom database?
 * Any way to bring the boundary into the AirBNB data?
 
 #### Areas to improve
 * Model is reliant on finding cross-listed properties, which could be too few to train a model (esp. outside major cities).  I have code to find the most likely cross-listings, and it does fairly well, but they must be manually validated.  I do not want this data to be a prediction, as it would put incorrect matches in my tiny positive class.
-
 * Current MVP trusts the lat, lon in the attom data.
 * I exclude private room listings from this model.
 * Company flag or not?  Make this a predictor if included?
@@ -60,6 +67,6 @@
 * Would it be reasonable to check host 'first names' for company names?
 
 #### Readme add-ons
-* Research fuzzy finders
+* Research fuzzy finders, whoswho
 * Describe what VRBO and ATTOM are.
 * Learn more about tax assessor data, licensing, and privacy issues.

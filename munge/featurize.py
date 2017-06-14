@@ -27,6 +27,18 @@ Air Conditioning -- not included; mostly NaN in attom, mostly True in airbnb
 Heating -- not included; assume the False listings in airbnb probably still have heating (it's Denver).
 Pool (tax assessor) -- 5 matches had pools per airbnb; none showed a pool in tax assessor data.
 '''
+def get_name_set(df):
+    '''
+    Use regex to pull first name from all tax 'owner' columns.  Combine all in a set.
+    '''
+    pass
+
+def check_names(df):
+    '''
+    Uppercase all airbnb names.
+    Check for set membership, set score to 100 if found.
+    Else get best whoswho score from comparing all names.
+    '''
 
 def get_features(df):
     featurized_df = pd.DataFrame([])

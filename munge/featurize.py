@@ -6,24 +6,31 @@ zipcode
 neighbor_count: Number of 'neighbors' in radius
 lat_offset: Difference in latitude (AirBNB minus Tax Assessor)
 lon_offset: Difference in longitude (AirBNB minus Tax Assessor)
-Air Conditioning -- not included; mostly NaN in attom, mostly True in airbnb
-Heating -- not included; assume the False listings in airbnb probably still have heating (it's Denver).
+
 fireplace_a: boolean -- airbnb indoor_fireplace == True
 fireplace_t: boolean -- tax assessor Fireplace code == 1.0
-Pets, elevator, pool, gym
-Similarity scores of AirBNB Host Name(s) and First Name on Deed etc. (each score is different predictor)
+pool_a: boolean -- swimming pool in airbnb listing
+pool_t: boolean -- swimming pool in tax assessor data
+
 Bedrooms on AirBNB listing
 Bedrooms on AirBNB listing - Bedrooms in Assessor Data
 Bathrooms on AirBNB listing
 Bathrooms on AirBNB listing - Bathrooms in Assessor Data
-Swimming pool on AirBNB listing
-Swimming pool in tax assessor data
-Has unit number
+Similarity scores of AirBNB Host Name(s) and First Name on Deed etc. (each score is a different predictor?)
+
+CANDIDATES DROPPED:
+accomodates -- all NaN
+AreaBuilding -- not useful without accomodates
+pets_a, elevator_a, gym_a: all boolean, from airbnb listing
+unit_number_t
+Air Conditioning -- not included; mostly NaN in attom, mostly True in airbnb
+Heating -- not included; assume the False listings in airbnb probably still have heating (it's Denver).
+Pool (tax assessor) -- 5 matches had pools per airbnb; none showed a pool in tax assessor data.
 '''
 
 def get_features(df):
     featurized_df = pd.DataFrame([])
-    featurized_df['MATCH'] = df.loc[:, 'MATCH']
+    featurized_df['MATCH'] = df.loc[:, 'MATCH'] #whether this a confirmed address match.  This will be y.
     featurized_df['attom_id'] = df.loc[:, '[ATTOM ID]']
     featurized_df['airbnb_property_id'] = df.loc[:, 'airbnb_property_id']
     featurized_df['airbnb_host_id'] = df.loc[:, 'airbnb_host_id']
@@ -36,6 +43,10 @@ def get_features(df):
     featurized_df['lon_offset'] = df.loc[:, 'longitude'] - df.loc[:, 'PropertyLongitude']
     featurized_df['fireplace_a'] = df['indoor_fireplace'].apply(lambda x: 1 if x == True else 0)
     featurized_df['fireplace_t'] = df['Fireplace'].apply(lambda x: 1 if x == 1.0 else 0)
+    featurized_df['beds_a'] = df.loc[:, 'bedrooms']
+    featurized_df['baths_a'] = df.loc[:, 'bathrooms']
+    featurized_df['bed_diff'] = df.loc[:, 'bedrooms'] - df.loc[:, 'BedroomsCount']
+    featurized_df['bath_diff'] = df.loc[:, 'bathrooms'] - df.loc[:, 'BathCount']
     return featurized_df
 
 if __name__ == '__main__':

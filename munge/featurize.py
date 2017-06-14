@@ -1,29 +1,25 @@
 import pandas as pd
 import geopy.distance
 import re
-from whoswho import who
-from fuzzywuzzy import fuzz
 
 '''FEATURES:
 zipcode
 neighbor_count: Number of 'neighbors' in radius
 lat_offset: Difference in latitude (AirBNB minus Tax Assessor)
 lon_offset: Difference in longitude (AirBNB minus Tax Assessor)
-
 fireplace_a: boolean -- airbnb indoor_fireplace == True
 fireplace_t: boolean -- tax assessor Fireplace code == 1.0
-pool_a: boolean -- swimming pool in airbnb listing
-pool_t: boolean -- swimming pool in tax assessor data
-
-Bedrooms on AirBNB listing
-Bedrooms on AirBNB listing - Bedrooms in Assessor Data
-Bathrooms on AirBNB listing
-Bathrooms on AirBNB listing - Bathrooms in Assessor Data
-Similarity scores of AirBNB Host Name(s) and First Name on Deed etc. (each score is a different predictor?)
+beds_a: Bedrooms on AirBNB listing
+bed_diff: Bedrooms on AirBNB listing minus Bedrooms in Assessor Data
+baths_a: Bathrooms on AirBNB listing
+bath_diff: Bathrooms on AirBNB listing minus Bathrooms in Assessor Data
+name_score: Similarity scores of AirBNB Host Name(s) and First Name on Deed etc. (each score is a different predictor?)
 
 CANDIDATES DROPPED:
+pool_a: boolean -- swimming pool in airbnb listing
+pool_t: boolean -- swimming pool in tax assessor data
 accomodates -- all NaN
-AreaBuilding -- not useful without accomodates
+AreaBuilding -- not useful without 'accomodates' data
 pets_a, elevator_a, gym_a: all boolean, from airbnb listing
 unit_number_t
 Air Conditioning -- not included; mostly NaN in attom, mostly True in airbnb
@@ -50,6 +46,7 @@ def get_features(df):
     featurized_df['baths_a'] = df.loc[:, 'bathrooms']
     featurized_df['bed_diff'] = df.loc[:, 'bedrooms'] - df.loc[:, 'BedroomsCount']
     featurized_df['bath_diff'] = df.loc[:, 'bathrooms'] - df.loc[:, 'BathCount']
+    featurized_df['name_score'] = df.loc[:, 'name_score']
     return featurized_df
 
 if __name__ == '__main__':

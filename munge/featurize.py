@@ -1,7 +1,8 @@
 import pandas as pd
 import geopy.distance
 import re
-# from whoswho import who
+from whoswho import who
+from fuzzywuzzy import fuzz
 
 '''FEATURES:
 zipcode
@@ -46,12 +47,17 @@ def check_names(df_row):
     Else get best whoswho score from comparing all names.
     '''
     name_set = get_name_set(df_row)
+    name1, name2 = df_row['first_name'], df_row['first_name2']
     print(name_set)
-    if (df_row['first_name'] or df_row['first_name2']) in name_set:
-        df_row['name_score'] = 100
-        print(df_row[['first_name', 'first_name2', 'name_score']])
+    if (name1 or name2) in name_set:
+        df_row['name_score'] = 100.0
     else:
-        pass
+        scores = [who.ratio(x,y) for x in (name1, name2) for y in name_set]
+        if len(scores) > 0 and max(scores) >= 25:
+            df_row['name_score'] = max(scores)
+        else:
+            df_row['name_score'] = 0
+    print(name1, name2, df_row['name_score'])
 
 def clean_up_names(df):
     df[['PartyOwner1NameFull', 'PartyOwner2NameFull']] = df[['PartyOwner1NameFull', 'PartyOwner2NameFull']].fillna('')

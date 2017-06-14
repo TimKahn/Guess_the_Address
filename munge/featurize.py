@@ -1,5 +1,6 @@
 import pandas as pd
 import geopy.distance
+import re
 
 '''FEATURES:
 zipcode
@@ -27,10 +28,13 @@ Air Conditioning -- not included; mostly NaN in attom, mostly True in airbnb
 Heating -- not included; assume the False listings in airbnb probably still have heating (it's Denver).
 Pool (tax assessor) -- 5 matches had pools per airbnb; none showed a pool in tax assessor data.
 '''
-def get_name_set(df):
+
+def get_name_set(df_row):
     '''
-    Use regex to pull first name from all tax 'owner' columns.  Combine all in a set.
+    Use regex to pull first name from all tax assessor 'owner' columns.  Combine all in a set.
     '''
+        m = re.findall('(?<=,)\w+|(?<=&\W)\w+', df_row.loc['PartyOwner1NameFull'])
+        print(m)
     pass
 
 def check_names(df):
@@ -42,7 +46,7 @@ def check_names(df):
 
 def get_features(df):
     featurized_df = pd.DataFrame([])
-    featurized_df['MATCH'] = df.loc[:, 'MATCH'] #whether this a confirmed address match.  This will be y.
+    featurized_df['MATCH'] = df.loc[:, 'MATCH'] #SET 1 or 0!  whether this a confirmed address match.  This will be y.
     featurized_df['attom_id'] = df.loc[:, '[ATTOM ID]']
     featurized_df['airbnb_property_id'] = df.loc[:, 'airbnb_property_id']
     featurized_df['airbnb_host_id'] = df.loc[:, 'airbnb_host_id']
@@ -59,6 +63,8 @@ def get_features(df):
     featurized_df['baths_a'] = df.loc[:, 'bathrooms']
     featurized_df['bed_diff'] = df.loc[:, 'bedrooms'] - df.loc[:, 'BedroomsCount']
     featurized_df['bath_diff'] = df.loc[:, 'bathrooms'] - df.loc[:, 'BathCount']
+    m = df.query('MATCH == 1')
+    m = m.apply(get_name_set, axis=1)
     return featurized_df
 
 if __name__ == '__main__':

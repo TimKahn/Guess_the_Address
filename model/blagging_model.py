@@ -1,4 +1,5 @@
 from blagging import BlaggingClassifier
+from sklearn.ensemble import GradientBoostingClassifier, AdaBoostClassifier
 import numpy as np
 from sklearn import cross_validation, metrics
 from sklearn.cross_validation import KFold, cross_val_score
@@ -60,10 +61,5 @@ def plot_PR_curve(classifier, X, y, n_folds=5):
 
 if __name__ == '__main__':
     X_train, X_test, y_train, y_test = split.get_split()
-    bc = BlaggingClassifier(n_estimators=20)
-    # bc.fit(X_train, y_train)
-    # predictions = bc.predict(X_test)
-    # print(predictions.sum())
-    # print(predictions[np.where(y_test==1)].sum())
-    # plot_PR_curve(bc, X_train, y_train)
-    plot_ROC_curve(bc, X_train, y_train)
+    # bc = BlaggingClassifier(AdaBoostClassifier(), n_estimators=20, n_jobs=-1)
+    # plot_ROC_curve(bc, X_train, y_train)

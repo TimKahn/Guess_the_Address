@@ -93,11 +93,49 @@ def get_host_names(airbnb_df):
     airbnb_df['first_name2'].fillna('', inplace=True)
     return airbnb_df
 
+def get_name_set(df_row):
+    '''
+    Use regex to pull first name from all tax assessor 'owner' columns.  Combine all in a set.
+    '''
+    cols = ['PartyOwner1NameFull', 'PartyOwner2NameFull']
+    name_set = set('')
+    for col in cols:
+        name_set.update(re.findall('(?<=,)\w+|(?<=&\W)\w+', df_row[col]))
+    return name_set
+
+def match_names(df_row):
+    '''
+    Check for set membership, set score to 100 if found.
+    Else get best whoswho score from comparing all names.
+    '''
+    name_set = get_name_set(df_row)
+    name1, name2 = df_row['first_name'], df_row['first_name2']
+    print(name_set)
+    if (name1 or name2) in name_set:
+        df_row['name_score'] = 100.0
+    else:
+        scores = [who.ratio(x,y) for x in (name1, name2) for y in name_set]
+        if len(scores) > 0 and max(scores) >= 25:
+            df_row['name_score'] = max(scores)
+        else:
+            df_row['name_score'] = 0
+    return df_row
+
+def process_names(df):
+    df[['PartyOwner1NameFull', 'PartyOwner2NameFull']] = df[['PartyOwner1NameFull', 'PartyOwner2NameFull']].fillna('')
+    df['first_name'] = df['first_name'].fillna('')
+    df['first_name'] = df['first_name'].apply(lambda x: str(x).upper())
+    df['first_name2'] = df['first_name2'].fillna('')
+    df['first_name2'] = df['first_name2'].apply(lambda x: str(x).upper())
+    df = df.apply(match_names, axis=1)
+    return df
+
 def process_airbnb(airbnb_df):
     cols_a = ['airbnb_property_id', 'match_score', 'true_latitude', 'true_longitude',
-       'prop_id_crosslist', 'title_crosslist', 'crosslisted_on',  'airbnb_host_id', 'first_name', 'first_name2', 'latitude', 'longitude', 'description', 'title',
-       'property_type', 'bedrooms', 'bathrooms', 'accomodates', 'pets_allowed', 'aircon', 'heating', 'elevator', 'pool', 'gym', 'indoor_fireplace', 'full_address', 'street_address', 'zipcode', 'gmaps_place_id', 'distance', 'attom_matches']
+       'prop_id_crosslist', 'title_crosslist', 'crosslisted_on',  'airbnb_host_id', 'first_name', 'first_name2', 'name_score', 'latitude', 'longitude', 'description', 'title', 'property_type', 'bedrooms', 'bathrooms', 'accomodates', 'pets_allowed', 'aircon', 'heating', 'elevator', 'pool',\
+       'gym', 'indoor_fireplace', 'full_address', 'street_address', 'zipcode', 'gmaps_place_id', 'distance', 'attom_matches']
     airbnb_df = get_host_names(airbnb_df)
+    airbnb_df = process_names(airbnb_df)
     airbnb_df = airbnb_df.loc[:, cols_a]
     airbnb_df['attom_id'] = airbnb_df['attom_matches'].apply(lambda x: x[0])
     return airbnb_df

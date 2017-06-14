@@ -1,6 +1,7 @@
 import pandas as pd
 import geopy.distance
 import re
+# from whoswho import who
 
 '''FEATURES:
 zipcode
@@ -33,20 +34,36 @@ def get_name_set(df_row):
     '''
     Use regex to pull first name from all tax assessor 'owner' columns.  Combine all in a set.
     '''
-        m = re.findall('(?<=,)\w+|(?<=&\W)\w+', df_row.loc['PartyOwner1NameFull'])
-        print(m)
-    pass
+    cols = ['PartyOwner1NameFull', 'PartyOwner2NameFull']
+    name_set = set('')
+    for col in cols:
+        name_set.update(re.findall('(?<=,)\w+|(?<=&\W)\w+', df_row[col]))
+    return name_set
 
-def check_names(df):
+def check_names(df_row):
     '''
-    Uppercase all airbnb names.
     Check for set membership, set score to 100 if found.
     Else get best whoswho score from comparing all names.
     '''
+    name_set = get_name_set(df_row)
+    print(name_set)
+    if (df_row['first_name'] or df_row['first_name2']) in name_set:
+        df_row['name_score'] = 100
+        print(df_row[['first_name', 'first_name2', 'name_score']])
+    else:
+        pass
+
+def clean_up_names(df):
+    df[['PartyOwner1NameFull', 'PartyOwner2NameFull']] = df[['PartyOwner1NameFull', 'PartyOwner2NameFull']].fillna('')
+    df['first_name'] = df['first_name'].fillna('')
+    df['first_name'] = df['first_name'].apply(lambda x: str(x).upper())
+    df['first_name2'] = df['first_name2'].fillna('')
+    df['first_name2'] = df['first_name2'].apply(lambda x: str(x).upper())
+    return df
 
 def get_features(df):
     featurized_df = pd.DataFrame([])
-    featurized_df['MATCH'] = df.loc[:, 'MATCH'] #SET 1 or 0!  whether this a confirmed address match.  This will be y.
+    featurized_df['MATCH'] = df.loc[:, 'MATCH'].apply(lambda x: 1 if x == True else 0) #whether this a confirmed address match.  This will be y.
     featurized_df['attom_id'] = df.loc[:, '[ATTOM ID]']
     featurized_df['airbnb_property_id'] = df.loc[:, 'airbnb_property_id']
     featurized_df['airbnb_host_id'] = df.loc[:, 'airbnb_host_id']
@@ -64,9 +81,10 @@ def get_features(df):
     featurized_df['bed_diff'] = df.loc[:, 'bedrooms'] - df.loc[:, 'BedroomsCount']
     featurized_df['bath_diff'] = df.loc[:, 'bathrooms'] - df.loc[:, 'BathCount']
     m = df.query('MATCH == 1')
-    m = m.apply(get_name_set, axis=1)
+    m = m.apply(check_names, axis=1)
     return featurized_df
 
 if __name__ == '__main__':
     df = pd.read_csv('../data/merged.csv')
+    df = clean_up_names(df)
     featurized_df = get_features(df)

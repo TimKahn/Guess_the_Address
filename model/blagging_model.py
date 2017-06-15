@@ -64,5 +64,5 @@ if __name__ == '__main__':
     # ifo.fit(X_train)
     # ifo_predictions = ifo.predict(X_train).reshape((-1, 1))
     # X_train = np.append(X_train, ifo_predictions, axis=1)
-    bc = BlaggingClassifier(n_estimators=40, random_state=42, n_jobs=-1)
+    bc = BlaggingClassifier(n_estimators=100, random_state=42, n_jobs=-1)
     plot_ROC_curve(bc, X_train, y_train)

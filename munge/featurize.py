@@ -37,16 +37,16 @@ def get_features(df):
     featurized_df['first_name2'] = df.loc[:, 'first_name2']
     featurized_df['title'] = df.loc[:, 'title']
     #predictors start here...
-    featurized_df['zipcode'] = int(df.loc[:, 'zipcode'].fillna(0))
+    featurized_df['zipcode'] = df.loc[:, 'zipcode'].fillna(0).apply(lambda x: int(x))
     featurized_df['neighbor_count'] = df.loc[:, 'neighbor_count']
     featurized_df['lat_offset'] = df.loc[:, 'latitude'] - df.loc[:, 'PropertyLatitude']
     featurized_df['lon_offset'] = df.loc[:, 'longitude'] - df.loc[:, 'PropertyLongitude']
     featurized_df['fireplace_a'] = df['indoor_fireplace'].apply(lambda x: 1 if x == True else 0)
     featurized_df['fireplace_t'] = df['Fireplace'].apply(lambda x: 1 if x == 1.0 else 0)
-    featurized_df['beds_a'] = df.loc[:, 'bedrooms']
-    featurized_df['baths_a'] = df.loc[:, 'bathrooms']
-    featurized_df['bed_diff'] = df.loc[:, 'bedrooms'] - df.loc[:, 'BedroomsCount']
-    featurized_df['bath_diff'] = df.loc[:, 'bathrooms'] - df.loc[:, 'BathCount']
+    featurized_df['beds_a'] = df.loc[:, 'bedrooms'].fillna(0)
+    featurized_df['baths_a'] = df.loc[:, 'bathrooms'].fillna(0)
+    featurized_df['bed_diff'] = df.loc[:, 'bedrooms'] - df.loc[:, 'BedroomsCount'].fillna(0)
+    featurized_df['bath_diff'] = df.loc[:, 'bathrooms'] - df.loc[:, 'BathCount'].fillna(0)
     featurized_df['name_score'] = df.loc[:, 'name_score']
     return featurized_df
 

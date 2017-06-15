@@ -13,7 +13,7 @@ beds_a: Bedrooms on AirBNB listing
 bed_diff: Bedrooms on AirBNB listing minus Bedrooms in Assessor Data
 baths_a: Bathrooms on AirBNB listing
 bath_diff: Bathrooms on AirBNB listing minus Bathrooms in Assessor Data
-name_score: Similarity scores of AirBNB Host Name(s) and First Name on Deed etc. (each score is a different predictor?)
+name_score: Max similarity scores of AirBNB Host Name(s) and PartyOwner 1 and 2.
 
 CANDIDATES DROPPED:
 pool_a: boolean -- swimming pool in airbnb listing
@@ -37,7 +37,7 @@ def get_features(df):
     featurized_df['first_name2'] = df.loc[:, 'first_name2']
     featurized_df['title'] = df.loc[:, 'title']
     #predictors start here...
-    featurized_df['zipcode'] = df.loc[:, 'zipcode']
+    featurized_df['zipcode'] = int(df.loc[:, 'zipcode'].fillna(0))
     featurized_df['neighbor_count'] = df.loc[:, 'neighbor_count']
     featurized_df['lat_offset'] = df.loc[:, 'latitude'] - df.loc[:, 'PropertyLatitude']
     featurized_df['lon_offset'] = df.loc[:, 'longitude'] - df.loc[:, 'PropertyLongitude']

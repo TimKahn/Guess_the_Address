@@ -1,5 +1,6 @@
 from blagging import BlaggingClassifier
 from sklearn.ensemble import GradientBoostingClassifier, AdaBoostClassifier, IsolationForest
+from sklearn.covariance import EllipticEnvelope
 import numpy as np
 from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import auc, roc_auc_score, roc_curve, precision_recall_curve
@@ -64,5 +65,9 @@ if __name__ == '__main__':
     # ifo.fit(X_train)
     # ifo_predictions = ifo.predict(X_train).reshape((-1, 1))
     # X_train = np.append(X_train, ifo_predictions, axis=1)
-    bc = BlaggingClassifier(n_estimators=100, random_state=42, n_jobs=-1)
+    bc = BlaggingClassifier(n_estimators=100, oob_score=True, random_state=42, n_jobs=-1)
     plot_ROC_curve(bc, X_train, y_train)
+
+    # ee = EllipticEnvelope(contamination=.02)
+    # ee.fit(X_train, y_train)
+    # ee_predictions = ee.predict(X_test)

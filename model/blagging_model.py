@@ -1,6 +1,5 @@
 from blagging import BlaggingClassifier
-from sklearn.ensemble import GradientBoostingClassifier, AdaBoostClassifier, IsolationForest
-from sklearn.covariance import EllipticEnvelope
+from sklearn.ensemble import GradientBoostingClassifier, AdaBoostClassifier
 import numpy as np
 from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import auc, roc_auc_score, roc_curve, precision_recall_curve
@@ -61,13 +60,6 @@ def plot_PR_curve(classifier, X, y, n_folds=5):
 if __name__ == '__main__':
     plt.close('all')
     X_train, X_test, y_train, y_test = split.get_split()
-    # ifo = IsolationForest(n_estimators=250, contamination=.025, n_jobs=-1, random_state=42)
-    # ifo.fit(X_train)
-    # ifo_predictions = ifo.predict(X_train).reshape((-1, 1))
     # X_train = np.append(X_train, ifo_predictions, axis=1)
-    bc = BlaggingClassifier(n_estimators=100, oob_score=True, random_state=42, n_jobs=-1)
-    plot_ROC_curve(bc, X_train, y_train)
-
-    # ee = EllipticEnvelope(contamination=.02)
-    # ee.fit(X_train, y_train)
-    # ee_predictions = ee.predict(X_test)
+    # bc = BlaggingClassifier(n_estimators=100, oob_score=True, random_state=42, n_jobs=-1)
+    # plot_ROC_curve(bc, X_train, y_train)

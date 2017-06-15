@@ -35,7 +35,7 @@ def get_features(df):
     featurized_df['airbnb_host_id'] = df.loc[:, 'airbnb_host_id']
     featurized_df['first_name'] = df.loc[:, 'first_name']
     featurized_df['first_name2'] = df.loc[:, 'first_name2']
-    featurized_df['title'] = df.loc[:, 'title']
+    featurized_df['title'] = df.loc[:, 'title'].astype(str).fillna('')
     #predictors start here...
     featurized_df['zipcode'] = df.loc[:, 'zipcode'].fillna(0).apply(lambda x: int(x))
     featurized_df['neighbor_count'] = df.loc[:, 'neighbor_count']
@@ -51,6 +51,6 @@ def get_features(df):
     return featurized_df
 
 if __name__ == '__main__':
-    df = pd.read_csv('../data/merged.csv')
+    df = pd.read_csv('../data/merged.csv', low_memory=False)
     featurized_df = get_features(df)
     featurized_df.to_csv('../data/featurized_data.csv')

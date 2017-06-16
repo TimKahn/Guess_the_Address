@@ -16,7 +16,7 @@ def plot_ROC_curve(classifier, X, y, pos_label=1, n_folds=5):
     for train, test in skf.split(X, y):
         classifier.fit(X[train], y[train])
         probas_ = classifier.predict_proba(X[test])
-        for t in [.9, .92, .94]:
+        for t in [.6, .7, .8, .9]:
             predictions = np.array([1 if p > t else 0 for p in probas_[:,1]])
             true_positives = predictions[np.where(predictions + y[test] == 2)].sum()
             actual_positives = y[test].sum()
@@ -35,7 +35,7 @@ def plot_ROC_curve(classifier, X, y, pos_label=1, n_folds=5):
     mean_auc = auc(mean_fpr, mean_tpr)
     plt.plot(mean_fpr, mean_tpr, 'k--',
          label='Mean ROC (area = %0.2f)' % mean_auc, lw=2)
-    plt.axvline(x=.035)
+    plt.axvline(x=.05)
     plt.xlim([-0.05, 1.05])
     plt.ylim([-0.05, 1.05])
     plt.xlabel('False Positive Rate')

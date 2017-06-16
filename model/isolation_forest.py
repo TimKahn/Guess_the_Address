@@ -5,7 +5,7 @@ import split
 
 if __name__ == '__main__':
     X, X_val, y, y_val = split.get_split()
-    ifo = IsolationForest(n_estimators=250, contamination=.1, n_jobs=-1, random_state=42)
+    ifo = IsolationForest(n_estimators=250, contamination=.2, n_jobs=-1, random_state=42)
     skf = StratifiedKFold(n_splits=5, random_state=42, shuffle=True)
     for train, test in skf.split(X, y):
         ifo.fit(X[train], y[train])

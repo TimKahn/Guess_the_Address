@@ -1,5 +1,5 @@
 from blagging import BlaggingClassifier
-from sklearn.ensemble import GradientBoostingClassifier, AdaBoostClassifier
+from sklearn.ensemble import GradientBoostingClassifier, AdaBoostClassifier, RandomForestClassifier
 import numpy as np
 from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import auc, roc_auc_score, roc_curve, precision_recall_curve
@@ -7,7 +7,7 @@ from scipy import interp
 import matplotlib.pyplot as plt
 import split
 
-def plot_ROC_curve(classifier, X, y, pos_label=1, n_folds=5):
+def plot_ROC_curve(classifier, X, y, pos_label=1, n_folds=3):
     mean_tpr = 0.0
     mean_fpr = np.linspace(0, 1, 100)
     all_tpr = []
@@ -16,7 +16,7 @@ def plot_ROC_curve(classifier, X, y, pos_label=1, n_folds=5):
     for train, test in skf.split(X, y):
         classifier.fit(X[train], y[train])
         probas_ = classifier.predict_proba(X[test])
-        for t in [.6, .7, .8, .9]:
+        for t in [.68, .7, .72]:
             predictions = np.array([1 if p > t else 0 for p in probas_[:,1]])
             true_positives = predictions[np.where(predictions + y[test] == 2)].sum()
             actual_positives = y[test].sum()
@@ -35,11 +35,12 @@ def plot_ROC_curve(classifier, X, y, pos_label=1, n_folds=5):
     mean_auc = auc(mean_fpr, mean_tpr)
     plt.plot(mean_fpr, mean_tpr, 'k--',
          label='Mean ROC (area = %0.2f)' % mean_auc, lw=2)
-    plt.axvline(x=.05)
+    plt.axvline(x=.1)
+    plt.axhline(y=.6)
     plt.xlim([-0.05, 1.05])
     plt.ylim([-0.05, 1.05])
-    plt.xlabel('False Positive Rate')
-    plt.ylabel('True Positive Rate')
+    plt.xlabel('False Positive Rate (of ~35,000 addresses)')
+    plt.ylabel('True Positive Rate (of ~100 addresses)')
     plt.title('ROC curve')
     plt.legend(loc="lower right")
     plt.show()
@@ -64,5 +65,8 @@ def plot_PR_curve(classifier, X, y, n_folds=5):
 if __name__ == '__main__':
     plt.close('all')
     X_train, X_test, y_train, y_test = split.get_split()
-    bc = BlaggingClassifier(n_estimators=100, random_state=42, n_jobs=-1)
+    bc = BlaggingClassifier(base_estimator=AdaBoostClassifier(), n_estimators=100, random_state=42, n_jobs=-1)
     plot_ROC_curve(bc, X_train, y_train)
+
+    # cl = AdaBoostClassifier(random_state=42)
+    # plot_ROC_curve(cl, X_train, y_train)

@@ -38,8 +38,8 @@ def get_features(df):
     featurized_df['title'] = df.loc[:, 'title'].astype(str).fillna('')
     #predictors start here...
     featurized_df['zipcode'] = df.loc[:, 'zipcode'].fillna(0).apply(lambda x: int(x))
-    featurized_df = pd.concat([featurized_df, pd.get_dummies(featurized_df['zipcode'])], axis=1)
-    featurized_df = featurized_df.drop('zipcode', 1)
+    # featurized_df = pd.concat([featurized_df, pd.get_dummies(featurized_df['zipcode'])], axis=1)
+    # featurized_df = featurized_df.drop('zipcode', 1)
     featurized_df['neighbor_count'] = df.loc[:, 'neighbor_count']
     featurized_df['lat_offset'] = df.loc[:, 'latitude'] - df.loc[:, 'PropertyLatitude']
     featurized_df['lon_offset'] = df.loc[:, 'longitude'] - df.loc[:, 'PropertyLongitude']

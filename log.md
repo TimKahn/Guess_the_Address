@@ -42,13 +42,16 @@
 #### 6.12.2017 Monday
 * Average of 989(!) properties in each circle.
 
-#### 6.13-6.15
+#### 6.13.2017 - 6.15.2017
 * Blagging and isolation forest are promising, other classifiers less so.
 * Make a profit curve script.
 * Use gaussian mixture model to identify distance cutoff.  Store # of positive class discarded -- false positives.
 * Add in 'accomodates' data.
 * Manually validate existing positive class.
 * Calibrate.
+
+#### 6.16.2017 Friday
+* AdaBoostClassifier is decent.  Baseline?
 
 #### Visuals
 * Scatter plot - indoor fireplace

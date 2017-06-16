@@ -27,7 +27,8 @@ def find_nearby(match, df):
     return df_near
 
 def find_in_radius(match, df_near):
-    radius = .51
+    radius = .3
+    print(match['latitude'], match['longitude'], df_near.shape[0])
     df_near['distance'] = df_near.apply(lambda row: get_distance(row, match['latitude'], match['longitude']), axis=1)
     df_near['true_distance'] = df_near.apply(lambda row: get_distance(row, match['true_latitude'], match['true_longitude']), axis=1)
     radius_df = df_near[df_near['distance'] <= radius]
@@ -62,17 +63,20 @@ def find_matches(df_row):
     closest = radius_df[radius_df['true_distance'] <= .05] #we'll look within 50m of true address to find a match in the tax assessor data.
     target = df_row['street_address'].split()
     attom_matches = []
-    print('Target: {}'.format(target))
-    for prop in closest.iterrows(): #check for matches within 50 meters
-        attom_id, address = prop[1]['[ATTOM ID]'], prop[1]['PropertyAddressFull']
+    # print('Target: {}'.format(target))
+    for idx, prop in closest.iterrows(): #check for matches within 50 meters
+        attom_id, address = prop['[ATTOM ID]'], prop['PropertyAddressFull']
         if test_address(address, target):
             attom_matches.append(attom_id)
     if len(attom_matches) == 0: #if no exact text matches, try matching the nearest property based on street number only
-        nearest_property = radius_df.loc[radius_df.true_distance.argmin()]
-        address = nearest_property['PropertyAddressFull']
-        if alternate_matching(address, target):
-            attom_matches.append(attom_id)
-    print('Number of Matches: {}'.format(len(attom_matches)))
+        try:
+            nearest_property = radius_df.loc[radius_df.true_distance.argmin()]
+            address = nearest_property['PropertyAddressFull']
+            if alternate_matching(address, target):
+                attom_matches.append(attom_id)
+        except:
+            print('No match in radius!')
+    # print('Number of Matches: {}'.format(len(attom_matches)))
     df_row['attom_matches'] = attom_matches
     df_row['number_of_matches'] = len(attom_matches)
     return df_row
@@ -132,7 +136,8 @@ def get_name_set(df_row):
 def match_names(df_row):
     '''
     Check for set membership, set score to 100 if found.
-    Else get best whoswho score from comparing all names.
+    Else get best whoswho score from comparing all names if better than 25.
+    If less than 25, set to zero.
     '''
     name_set = get_name_set(df_row)
     name1, name2 = df_row['first_name'], df_row['first_name2']
@@ -157,24 +162,24 @@ def process_names(df):
     return df
 
 if __name__ == '__main__':
-    # matches_df = pd.read_csv('../data/matches_geo.csv')
-    # matches_df = matches_df.query("match_score >= 40 & distance <= .51 & room_type == 'Entire home/apt'")
-    # print('NUMBER OF POTENTIAL MATCHES: {}'.format(matches_df.shape[0]))
+    matches_df = pd.read_csv('../data/matches_geo.csv')
+    matches_df = matches_df.query("match_score >= 40 & distance <= .3 & room_type == 'Entire home/apt'")
+    print('NUMBER OF POTENTIAL MATCHES: {}'.format(matches_df.shape[0]))
 
     tax_df = pd.read_csv('../data/tax_assessor_denver.csv')
     tax_df = tax_df.loc[tax_df['CompanyFlag'] != 'Y'] #consider dropping this restriction -- use as predictor?
 
-    # matches_df = matches_df.apply(find_matches, axis=1)
-    # non_matches = matches_df.loc[matches_df['number_of_matches']==0]
-    # single_matches = matches_df.loc[matches_df['number_of_matches']==1]
-    # multi_matches = matches_df.loc[matches_df['number_of_matches']>1]
-    # single_matches.to_pickle('../data/single_matches.pkl')
+    matches_df = matches_df.apply(find_matches, axis=1)
+    non_matches = matches_df.loc[matches_df['number_of_matches']==0]
+    single_matches = matches_df.loc[matches_df['number_of_matches']==1]
+    multi_matches = matches_df.loc[matches_df['number_of_matches']>1]
+    single_matches.to_pickle('../data/single_matches.pkl')
 
-    # validated_matches = pd.read_pickle('../data/single_matches.pkl')
-    # validated_matches = process_airbnb(validated_matches)
-    # merged_data = append_neighbors(validated_matches, tax_df)
-    # merged_data.to_pickle('../data/merged.pkl')
-    
+    validated_matches = pd.read_pickle('../data/single_matches.pkl')
+    validated_matches = process_airbnb(validated_matches)
+    merged_data = append_neighbors(validated_matches, tax_df)
+    merged_data.to_pickle('../data/merged.pkl')
+
     merged_data = pd.read_pickle('../data/merged.pkl')
     merged_data = process_names(merged_data)
     merged_data.to_csv('../data/merged.csv')

@@ -16,6 +16,12 @@ def plot_ROC_curve(classifier, X, y, pos_label=1, n_folds=5):
     for train, test in skf.split(X, y):
         classifier.fit(X[train], y[train])
         probas_ = classifier.predict_proba(X[test])
+        for t in [.9, .92, .94]:
+            predictions = np.array([1 if p > t else 0 for p in probas_[:,1]])
+            true_positives = predictions[np.where(predictions + y[test] == 2)].sum()
+            actual_positives = y[test].sum()
+            false_positives = predictions.sum() - true_positives
+            print(t, true_positives, actual_positives, false_positives/true_positives)
         # Compute ROC curve and area under the curve
         fpr, tpr, thresholds = roc_curve(y[test], probas_[:, 1], pos_label=1)
         mean_tpr += interp(mean_fpr, fpr, tpr)
@@ -29,6 +35,7 @@ def plot_ROC_curve(classifier, X, y, pos_label=1, n_folds=5):
     mean_auc = auc(mean_fpr, mean_tpr)
     plt.plot(mean_fpr, mean_tpr, 'k--',
          label='Mean ROC (area = %0.2f)' % mean_auc, lw=2)
+    plt.axvline(x=.035)
     plt.xlim([-0.05, 1.05])
     plt.ylim([-0.05, 1.05])
     plt.xlabel('False Positive Rate')
@@ -38,9 +45,6 @@ def plot_ROC_curve(classifier, X, y, pos_label=1, n_folds=5):
     plt.show()
 
 def plot_PR_curve(classifier, X, y, n_folds=5):
-    """
-    Plot precision/recall curve.
-    """
     skf = StratifiedKFold(n_splits=n_folds, random_state=42, shuffle=True)
     i = 1
     for train, test in skf.split(X, y):
@@ -60,6 +64,5 @@ def plot_PR_curve(classifier, X, y, n_folds=5):
 if __name__ == '__main__':
     plt.close('all')
     X_train, X_test, y_train, y_test = split.get_split()
-    # X_train = np.append(X_train, ifo_predictions, axis=1)
-    # bc = BlaggingClassifier(n_estimators=100, oob_score=True, random_state=42, n_jobs=-1)
-    # plot_ROC_curve(bc, X_train, y_train)
+    bc = BlaggingClassifier(n_estimators=100, random_state=42, n_jobs=-1)
+    plot_ROC_curve(bc, X_train, y_train)

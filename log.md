@@ -42,16 +42,20 @@
 #### 6.12.2017 Monday
 * Average of 989(!) properties in each circle.
 
-#### 6.13.2017 Tuesday
-* Assuming that separate binaries are better.
+#### 6.13-6.15
+* Blagging and isolation forest are promising, other classifiers less so.
+* Make a profit curve script.
+* Use gaussian mixture model to identify distance cutoff.  Store # of positive class discarded -- false positives.
+* Add in 'accomodates' data.
+* Manually validate existing positive class.
+* Calibrate.
 
 #### Visuals
 * Scatter plot - indoor fireplace
 * Plot bedrooms vs. bed difference, bathrooms vs. bath difference -- with regression lines?
+* k-fold cross-validation
 
 #### Questions for Dan
-* Airbnb - Accommodates
-* Quantify profit of true positive?  Of mechanical turk validation?
 * Any ideas for properties not in attom database?
 * Any way to bring the boundary into the AirBNB data?
 

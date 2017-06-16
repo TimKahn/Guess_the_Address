@@ -3,7 +3,7 @@ import pandas as pd
 
 def get_split():
     df = pd.read_csv('../data/featurized_data.csv')
-    print(df.info())
+    # print(df.info())
     identifiers = df.loc[:, ['attom_id', 'airbnb_property_id', 'airbnb_host_id', 'first_name', 'first_name2', 'title']]
     df = df.drop(['attom_id', 'airbnb_property_id', 'airbnb_host_id', 'first_name', 'first_name2', 'title'], axis=1)
     y = df.pop('MATCH').values

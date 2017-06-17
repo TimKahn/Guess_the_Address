@@ -36,7 +36,7 @@
 
 #### 6.11.2017 Sunday
 * Initial pool of 185 match candidates, score >= 40, distance <= .51.
- * 116 with one match, 52 unmatched, 17 'multi-matched' and need to be manually validated.
+* 116 with one match, 52 unmatched, 17 'multi-matched' and need to be manually validated.
 * Try without restriction on company flag...
 
 #### 6.12.2017 Monday
@@ -46,12 +46,22 @@
 * Blagging and isolation forest are promising, other classifiers less so.
 * Make a profit curve script.
 * Use gaussian mixture model to identify distance cutoff.  Store # of positive class discarded -- false positives.
-* Add in 'accomodates' data.
-* Manually validate existing positive class.
 * Calibrate.
 
 #### 6.16.2017 Friday
+* Create curves class, run all models from same script (grid-search?)
+* Use all data since I'm cross-validating.
 * AdaBoostClassifier is decent.  Baseline?
+
+#### 6.17.2017 Saturday goals
+* Use EM on distance, manually validate, add in 'accomodates' data.
+* Resume, LinkedIn, presentation skeleton
+* Profit curve, distribution of houses (rough)
+
+#### 6.18.2017 Sunday goals
+* Mechanical Turk research.
+* Refine visuals, try calibration, update readme.
+* Questions for Scott & Dan.
 
 #### Visuals
 * Scatter plot - indoor fireplace

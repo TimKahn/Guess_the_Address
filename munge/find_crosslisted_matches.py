@@ -44,7 +44,7 @@ def combine_data():
     return df_all
 
 def get_airbnb():
-    df_a = pd.read_csv('../data/airbnb_denver.csv')
+    df_a = pd.read_csv('../data/den_prop_6_15.csv')
     df_a.drop_duplicates('airbnb_property_id', inplace=True)
     df_a = df_a[pd.notnull(df_a['title'])]
     df_a.reset_index(drop=True)

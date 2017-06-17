@@ -9,7 +9,7 @@ from scipy import interp
 import matplotlib.pyplot as plt
 import split
 
-def plot_ROC_curve(classifier, X, y, style, pos_label=1, n_folds=5):
+def plot_ROC_curve(classifier, classifier2, X, y, pos_label=1, n_folds=5):
     mean_tpr = 0.0
     mean_fpr = np.linspace(0, 1, 100)
     all_tpr = []
@@ -17,8 +17,16 @@ def plot_ROC_curve(classifier, X, y, style, pos_label=1, n_folds=5):
     i = 1
     for train, test in skf.split(X, y):
         classifier.fit(X[train], y[train])
-        probas_ = classifier.predict_proba(X[test])
-        for t in [.68, .7, .72]:
+        probas_train = classifier.predict_proba(X[train])
+        proba_column_trn = probas_train[:,1].reshape((-1, 1))
+        X_trn_new = np.append(X[train], proba_column_trn, axis=1)
+        probas_test = classifier.predict_proba(X[test])
+        proba_column_test = probas_test[:,1].reshape((-1,1))
+        X_test_new = np.append(X[test], proba_column_test, axis=1)
+        #appended classifier 1 probabilities, now train classifier 2 on stack
+        classifier2.fit(X_trn_new, y[train])
+        probas_ = classifier2.predict_proba(X_test_new)
+        for t in [.7, .73, .76]:
             predictions = np.array([1 if p > t else 0 for p in probas_[:,1]])
             true_positives = predictions[np.where(predictions + y[test] == 2)].sum()
             actual_positives = y[test].sum()
@@ -29,13 +37,13 @@ def plot_ROC_curve(classifier, X, y, style, pos_label=1, n_folds=5):
         mean_tpr += interp(mean_fpr, fpr, tpr)
         mean_tpr[0] = 0.0
         roc_auc = auc(fpr, tpr)
-        # plt.plot(fpr, tpr, lw=1, label='ROC fold %d (area = %0.2f)' % (i, roc_auc))
+        plt.plot(fpr, tpr, lw=1, label='ROC fold %d (area = %0.2f)' % (i, roc_auc))
         i += 1
     plt.plot([0, 1], [0, 1], '--', color=(0.6, 0.6, 0.6), label='Random')
     mean_tpr /= n_folds
     mean_tpr[-1] = 1.0
     mean_auc = auc(mean_fpr, mean_tpr)
-    plt.plot(mean_fpr, mean_tpr, style,
+    plt.plot(mean_fpr, mean_tpr, 'k--',
          label='Mean ROC (area = %0.2f)' % mean_auc, lw=2)
     plt.axvline(x=.096)
     plt.axhline(y=.6)
@@ -67,7 +75,7 @@ def plot_PR_curve(classifier, X, y, n_folds=5):
 if __name__ == '__main__':
     plt.close('all')
     X_train, X_test, y_train, y_test = split.get_split()
-    bc = BlaggingClassifier(base_estimator=DecisionTreeClassifier(criterion='entropy', max_features=.6), n_estimators=200, random_state=42, n_jobs=-1)
-    plot_ROC_curve(bc, X_train, y_train, 'r--')
-    xg = XGBClassifier()
-    plot_ROC_curve(xg, X_train, y_train, 'b--')
+    bc = BlaggingClassifier(base_estimator=DecisionTreeClassifier(criterion='entropy', max_features=.6),n_estimators=200, random_state=42, n_jobs=-1)
+    # plot_ROC_curve(bc, X_train, y_train)
+    xgb = XGBClassifier()
+    plot_ROC_curve(xgb, bc, X_train, y_train)

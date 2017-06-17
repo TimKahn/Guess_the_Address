@@ -37,7 +37,7 @@ def get_features(df):
     featurized_df['first_name2'] = df.loc[:, 'first_name2']
     featurized_df['title'] = df.loc[:, 'title'].astype(str).fillna('')
     #predictors start here...
-    featurized_df['zipcode'] = df.loc[:, 'zipcode'].fillna(0).apply(lambda x: int(x))
+    # featurized_df['zipcode'] = df.loc[:, 'zipcode'].fillna(0).apply(lambda x: int(x))
     # featurized_df = pd.concat([featurized_df, pd.get_dummies(featurized_df['zipcode'])], axis=1)
     # featurized_df = featurized_df.drop('zipcode', 1)
     featurized_df['neighbor_count'] = df.loc[:, 'neighbor_count']
@@ -46,9 +46,10 @@ def get_features(df):
     featurized_df['fireplace_a'] = df['indoor_fireplace'].apply(lambda x: 1 if x == True else 0)
     featurized_df['fireplace_t'] = df['Fireplace'].apply(lambda x: 1 if x == 1.0 else 0)
     featurized_df['beds_a'] = df.loc[:, 'bedrooms'].fillna(0)
-    featurized_df['baths_a'] = df.loc[:, 'bathrooms'].fillna(0)
     featurized_df['bed_diff'] = df.loc[:, 'bedrooms'] - df.loc[:, 'BedroomsCount'].fillna(0)
+    featurized_df['baths_a'] = df.loc[:, 'bathrooms'].fillna(0)
     featurized_df['bath_diff'] = df.loc[:, 'bathrooms'] - df.loc[:, 'BathCount'].fillna(0)
+    # featurized_df['accommodates'] = df.loc[:, 'accommodates'].astype(int).fillna(0)
     featurized_df['name_score'] = df.loc[:, 'name_score']
     return featurized_df
 

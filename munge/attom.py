@@ -102,7 +102,7 @@ def process_airbnb(airbnb_df):
     cols_a = ['airbnb_property_id', 'match_score', 'true_latitude', 'true_longitude',
        'prop_id_crosslist', 'title_crosslist', 'crosslisted_on',  'airbnb_host_id',\
         'first_name', 'first_name2', 'latitude', 'longitude', 'description', 'title',\
-        'property_type', 'bedrooms', 'bathrooms', 'accomodates', 'pets_allowed',\
+        'property_type', 'bedrooms', 'bathrooms', 'accommodates', 'pets_allowed',\
         'aircon', 'heating', 'elevator', 'pool', 'gym', 'indoor_fireplace',\
         'full_address', 'street_address', 'zipcode', 'gmaps_place_id', 'distance', 'attom_matches']
     airbnb_df = get_host_names(airbnb_df)

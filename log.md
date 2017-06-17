@@ -51,15 +51,17 @@
 #### 6.16.2017 Friday
 * Create curves class, run all models from same script (grid-search?)
 * Use all data since I'm cross-validating.
-* AdaBoostClassifier is decent.  Baseline?
+* AdaBoostClassifier is decent.  Baseline?  Show SVC/SVM?
 
 #### 6.17.2017 Saturday goals
-* Use EM on distance, manually validate, add in 'accomodates' data.
+* Use EM on distance, manually validate, add in 'accommodates' data.
 * Resume, LinkedIn, presentation skeleton
 * Profit curve, distribution of houses (rough)
 
 #### 6.18.2017 Sunday goals
 * Mechanical Turk research.
+* Undersampling, SMOTE.
+* Feature importance / overfitting concerns.
 * Refine visuals, try calibration, update readme.
 * Questions for Scott & Dan.
 

@@ -29,7 +29,7 @@ def find_nearby(match, df):
 def find_in_radius(match, df_near):
     radius = .3
     # print(match['latitude'], match['longitude'], df_near.shape[0])
-    df_near['distance'] = df_near.apply(lambda row: get_distance(row, match['latitude'], match['longitude']), axis=1)
+    df_near['distance'] = df_near.apply(lambda row: get_distance(row, match['latitude'], match['longitude']), axis=1).fillna(radius + .1)
     df_near['true_distance'] = df_near.apply(lambda row: get_distance(row, match['true_latitude'], match['true_longitude']), axis=1)
     radius_df = df_near[df_near['distance'] <= radius]
     return radius_df

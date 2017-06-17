@@ -1,6 +1,4 @@
 import pandas as pd
-import geopy.distance
-import re
 
 '''FEATURES:
 zipcode
@@ -18,13 +16,12 @@ name_score: Max similarity scores of AirBNB Host Name(s) and PartyOwner 1 and 2.
 CANDIDATES DROPPED:
 pool_a: boolean -- swimming pool in airbnb listing
 pool_t: boolean -- swimming pool in tax assessor data
-accomodates -- all NaN
-AreaBuilding -- not useful without 'accomodates' data
-pets_a, elevator_a, gym_a: all boolean, from airbnb listing
-unit_number_t
+AreaBuilding: not useful without 'accomodates' data
+pets_a, elevator_a, gym_a: all boolean, from airbnb listing.  Could indicated whether property is a unit in apt/condo.
+unit_number_t: boolean -- 1 if tax assessor data shows a unit number.  Too few in training data to be a viable predictor.
 Air Conditioning -- not included; mostly NaN in attom, mostly True in airbnb
 Heating -- not included; assume the False listings in airbnb probably still have heating (it's Denver).
-Pool (tax assessor) -- 5 matches had pools per airbnb; none showed a pool in tax assessor data.
+Pool (tax assessor) -- 5 matches had pools in airbnb data; none of these five showed a pool in tax assessor data.
 '''
 
 def get_features(df):
@@ -40,15 +37,16 @@ def get_features(df):
     # featurized_df['zipcode'] = df.loc[:, 'zipcode'].fillna(0).apply(lambda x: int(x))
     # featurized_df = pd.concat([featurized_df, pd.get_dummies(featurized_df['zipcode'])], axis=1)
     # featurized_df = featurized_df.drop('zipcode', 1)
-    featurized_df['neighbor_count'] = df.loc[:, 'neighbor_count']
+    # featurized_df['neighbor_count'] = df.loc[:, 'neighbor_count']
     featurized_df['lat_offset'] = df.loc[:, 'latitude'] - df.loc[:, 'PropertyLatitude']
     featurized_df['lon_offset'] = df.loc[:, 'longitude'] - df.loc[:, 'PropertyLongitude']
-    featurized_df['fireplace_a'] = df['indoor_fireplace'].apply(lambda x: 1 if x == True else 0)
-    featurized_df['fireplace_t'] = df['Fireplace'].apply(lambda x: 1 if x == 1.0 else 0)
+    # featurized_df['fireplace_a'] = df['indoor_fireplace'].apply(lambda x: 1 if x == True else 0)
+    # featurized_df['fireplace_t'] = df['Fireplace'].apply(lambda x: 1 if x == 1.0 else 0)
     featurized_df['beds_a'] = df.loc[:, 'bedrooms'].fillna(0)
     featurized_df['bed_diff'] = df.loc[:, 'bedrooms'] - df.loc[:, 'BedroomsCount'].fillna(0)
-    featurized_df['baths_a'] = df.loc[:, 'bathrooms'].fillna(0)
+    # featurized_df['baths_a'] = df.loc[:, 'bathrooms'].fillna(0)
     featurized_df['bath_diff'] = df.loc[:, 'bathrooms'] - df.loc[:, 'BathCount'].fillna(0)
+    # featurized_df['square_feet'] = df.loc[:, 'AreaBuilding'].fillna(0)
     # featurized_df['accommodates'] = df.loc[:, 'accommodates'].astype(int).fillna(0)
     featurized_df['name_score'] = df.loc[:, 'name_score']
     return featurized_df

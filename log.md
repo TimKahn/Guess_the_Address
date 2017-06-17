@@ -44,9 +44,6 @@
 
 #### 6.13.2017 - 6.15.2017
 * Blagging and isolation forest are promising, other classifiers less so.
-* Make a profit curve script.
-* Use gaussian mixture model to identify distance cutoff.  Store # of positive class discarded -- false positives.
-* Calibrate.
 
 #### 6.16.2017 Friday
 * Create curves class, run all models from same script (grid-search?)
@@ -54,21 +51,20 @@
 * AdaBoostClassifier is decent.  Baseline?  Show SVC/SVM?
 
 #### 6.17.2017 Saturday goals
-* Use EM on distance, manually validate, add in 'accommodates' data.
-* Resume, LinkedIn, presentation skeleton
+* Use EM on distance, manually validate.
 * Profit curve, distribution of houses (rough)
+* Mechanical Turk research.
 
 #### 6.18.2017 Sunday goals
-* Mechanical Turk research.
-* Undersampling, SMOTE.
+* Resume, LinkedIn, presentation skeleton, readme.
 * Feature importance / overfitting concerns.
-* Refine visuals, try calibration, update readme.
 * Questions for Scott & Dan.
+* Undersampling, SMOTE.
 
 #### Visuals
 * Scatter plot - indoor fireplace
 * Plot bedrooms vs. bed difference, bathrooms vs. bath difference -- with regression lines?
-* k-fold cross-validation
+* 5-fold cross-validation
 
 #### Questions for Dan
 * Any ideas for properties not in attom database?

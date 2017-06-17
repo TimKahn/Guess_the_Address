@@ -8,8 +8,9 @@ def get_split():
     df = df.drop(['attom_id', 'airbnb_property_id', 'airbnb_host_id', 'first_name', 'first_name2', 'title'], axis=1)
     y = df.pop('MATCH').values
     X = df.values
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.01, random_state=42, stratify=y)
-    return X_train, X_test, y_train, y_test
+    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.01, random_state=42, stratify=y)
+    # return X_train, X_test, y_train, y_test
+    return X, y
 
 if __name__ == '__main__':
     get_split()

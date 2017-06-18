@@ -19,8 +19,8 @@ def fit_gamma(distances):
 
 if __name__ == '__main__':
     plt.close('all')
-    matches = pd.read_pickle('../data/single_matches.pkl')
-    distances = matches.true_distance.apply(lambda x: 1000*x).values.reshape((-1, 1)) #convert to meters, put in nx1 array.
+    matches = pd.read_csv('../data/merged.csv').query('MATCH==1')
+    distances = matches.listing_distance.apply(lambda x: 1000*x).values.reshape((-1, 1)) #convert to meters, put in nx1 array.
     labels = np.array([1 if x > 300 else 0 for x in distances])
     mean0 = distances[np.where(labels==0)].mean()
     mean1 = distances[np.where(labels==1)].mean()

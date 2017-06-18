@@ -66,7 +66,7 @@ def find_matches(df_row):
     closest = radius_df[radius_df['true_distance'] <= .05] #we'll look within 50m of true address to find a match in the tax assessor data.
     target = df_row['street_address'].split()
     attom_matches = []
-    # print('Target: {}'.format(target))
+    print('Target: {}'.format(target))
     for idx, prop in closest.iterrows(): #check for matches within 50 meters
         attom_id, address = prop['[ATTOM ID]'], prop['PropertyAddressFull']
         if test_address(address, target):
@@ -118,7 +118,7 @@ def process_airbnb(airbnb_df):
         'first_name', 'first_name2', 'latitude', 'longitude', 'description', 'title',\
         'property_type', 'bedrooms', 'bathrooms', 'accommodates', 'pets_allowed',\
         'aircon', 'heating', 'elevator', 'pool', 'gym', 'indoor_fireplace',\
-        'full_address', 'street_address', 'zipcode', 'gmaps_place_id', 'distance', 'attom_matches']
+        'full_address', 'street_address', 'zipcode', 'gmaps_place_id', 'listing_distance', 'attom_matches']
     airbnb_df = get_host_names(airbnb_df)
     airbnb_df = airbnb_df.loc[:, cols_a]
     airbnb_df['attom_id'] = airbnb_df['attom_matches'].apply(lambda x: x[0])
@@ -179,10 +179,10 @@ if __name__ == '__main__':
     # matches_df = pd.read_csv('../data/matches_geo.csv')
     # matches_df = matches_df.query("match_score >= 40 & room_type == 'Entire home/apt'")
     # print('NUMBER OF POTENTIAL MATCHES: {}'.format(matches_df.shape[0]))
-    #
+
     tax_df = pd.read_csv('../data/tax_assessor_denver.csv')
     tax_df = tax_df.loc[tax_df['CompanyFlag'] != 'Y'] #consider dropping this restriction -- use as predictor?
-    #
+
     # matches_df = matches_df.apply(find_matches, axis=1)
     # non_matches = matches_df.loc[matches_df['number_of_matches']==0]
     # single_matches = matches_df.loc[matches_df['number_of_matches']==1]
@@ -197,7 +197,7 @@ if __name__ == '__main__':
     validated_matches = single_matches.query('validated==1')
 
     radius = .5
-    validated_matches = validated_matches[validated_matches['distance'] <= radius]
+    validated_matches = validated_matches[validated_matches['listing_distance'] <= radius]
     validated_matches = process_airbnb(validated_matches)
     merged_data = append_neighbors(validated_matches, tax_df, radius)
     merged_data = process_names(merged_data)

@@ -28,7 +28,7 @@ def find_nearby(match, df):
 
 def find_in_radius(match, df_near, radius):
     # print(match['latitude'], match['longitude'], df_near.shape[0])
-    df_near['distance'] = df_near.apply(lambda row: get_distance(row, match['latitude'], match['longitude']), axis=1).fillna(radius + .1)
+    df_near['distance'] = df_near.apply(lambda row: get_distance(row, match['latitude'], match['longitude']), axis=1)
     df_near['true_distance'] = df_near.apply(lambda row: get_distance(row, match['true_latitude'], match['true_longitude']), axis=1)
     radius_df = df_near.loc[df_near['distance'] <= radius]
     return radius_df
@@ -97,6 +97,19 @@ def get_host_names(airbnb_df):
     airbnb_df['first_name2'].fillna('', inplace=True)
     return airbnb_df
 
+def get_val_features(df):
+    urls = {'AirBNB': 'https://www.airbnb.com/rooms/', 'Homeaway': 'https://www.homeaway.com/vacation-rental/', 'VRBO': 'https://www.vrbo.com/'}
+    val_df = pd.DataFrame([])
+    val_df['validated'] = 0
+    val_df['title'] = df.loc[:, 'title']
+    val_df['title_crosslist'] = df.loc[:, 'title_crosslist']
+    val_df['airbnb_url'] = urls['AirBNB'].join(df['airbnb_property_id'].astype(str))
+    crosslist_urls = df['crosslisted_on'].apply(lambda x: str(urls[x])).to_frame()
+    property_ids = df['prop_id_crosslist'].astype(str)
+    print(crosslist_urls.shape, property_ids.shape)
+    val_df['crosslist_url'] = crosslist_urls.join(property_ids)
+    return val_df
+
 def process_airbnb(airbnb_df):
     cols_a = ['airbnb_property_id', 'match_score', 'true_latitude', 'true_longitude',
        'prop_id_crosslist', 'title_crosslist', 'crosslisted_on',  'airbnb_host_id',\
@@ -109,12 +122,12 @@ def process_airbnb(airbnb_df):
     airbnb_df['attom_id'] = airbnb_df['attom_matches'].apply(lambda x: x[0])
     return airbnb_df
 
-def append_neighbors(airbnb_df, tax_df):
+def append_neighbors(airbnb_df, tax_df, radius):
     new_df = pd.DataFrame([])
     for idx, row in airbnb_df.iterrows():
         print(row['title'])
         nearby_df = find_nearby(row, tax_df) #find properties +/- lat, lon tolerance to minimize distance calculations...
-        radius_df = find_in_radius(row, nearby_df, radius=.3) #then find the subset of those properties within 500m
+        radius_df = find_in_radius(row, nearby_df, radius) #then find the subset of those properties within 500m
         radius_df['airbnb_property_id'] = row.loc['airbnb_property_id']
         radius_df['MATCH'] = radius_df['[ATTOM ID]'].apply(lambda x: x == row['attom_id'])
         radius_df['neighbor_count'] = radius_df.shape[0]
@@ -161,25 +174,26 @@ def process_names(df):
     return df
 
 if __name__ == '__main__':
-    matches_df = pd.read_csv('../data/matches_geo.csv')
-    matches_df = matches_df.query("match_score >= 40 & room_type == 'Entire home/apt'")
-    print('NUMBER OF POTENTIAL MATCHES: {}'.format(matches_df.shape[0]))
+    # matches_df = pd.read_csv('../data/matches_geo.csv')
+    # matches_df = matches_df.query("match_score >= 40 & room_type == 'Entire home/apt'")
+    # print('NUMBER OF POTENTIAL MATCHES: {}'.format(matches_df.shape[0]))
+    #
+    # tax_df = pd.read_csv('../data/tax_assessor_denver.csv')
+    # tax_df = tax_df.loc[tax_df['CompanyFlag'] != 'Y'] #consider dropping this restriction -- use as predictor?
+    #
+    # matches_df = matches_df.apply(find_matches, axis=1)
+    # non_matches = matches_df.loc[matches_df['number_of_matches']==0]
+    # single_matches = matches_df.loc[matches_df['number_of_matches']==1]
+    # multi_matches = matches_df.loc[matches_df['number_of_matches']>1]
+    # single_matches.to_pickle('../data/single_matches.pkl')
 
-    tax_df = pd.read_csv('../data/tax_assessor_denver.csv')
-    tax_df = tax_df.loc[tax_df['CompanyFlag'] != 'Y'] #consider dropping this restriction -- use as predictor?
+    single_matches = pd.read_pickle('../data/single_matches.pkl')
+    validation_data = get_val_features(single_matches)
 
-    matches_df = matches_df.apply(find_matches, axis=1)
-    non_matches = matches_df.loc[matches_df['number_of_matches']==0]
-    single_matches = matches_df.loc[matches_df['number_of_matches']==1]
-    multi_matches = matches_df.loc[matches_df['number_of_matches']>1]
-    single_matches.to_pickle('../data/single_matches.pkl')
-
-    validated_matches = pd.read_pickle('../data/single_matches.pkl')
-    validated_matches = validated_matches.query("distance <= .3")
-    validated_matches = process_airbnb(validated_matches)
-    merged_data = append_neighbors(validated_matches, tax_df)
-    merged_data.to_pickle('../data/merged.pkl')
-
-    merged_data = pd.read_pickle('../data/merged.pkl')
-    merged_data = process_names(merged_data)
-    merged_data.to_csv('../data/merged.csv')
+    # validated_matches = pd.read_pickle('../data/single_matches.pkl')
+    # radius = .2
+    # validated_matches = validated_matches[validated_matches['distance'] <= radius]
+    # validated_matches = process_airbnb(validated_matches)
+    # merged_data = append_neighbors(validated_matches, tax_df, radius)
+    # merged_data = process_names(merged_data)
+    # merged_data.to_csv('../data/merged.csv')

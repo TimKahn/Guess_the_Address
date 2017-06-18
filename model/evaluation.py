@@ -3,9 +3,9 @@ from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import auc, roc_auc_score, roc_curve, precision_recall_curve
 from scipy import interp
 import matplotlib.pyplot as plt
-from imblearn.combine import SMOTETomek, SMOTEENN
-from imblearn.over_sampling import SMOTE
-from imblearn.under_sampling import TomekLinks, AllKNN
+# from imblearn.combine import SMOTETomek, SMOTEENN
+# from imblearn.over_sampling import SMOTE
+# from imblearn.under_sampling import TomekLinks, AllKNN
 
 def plot_ROC_curve(classifier, X, y, style, pos_label=1, n_folds=5):
     mean_tpr = 0.0
@@ -43,12 +43,12 @@ def plot_ROC_curve(classifier, X, y, style, pos_label=1, n_folds=5):
     mean_auc = auc(mean_fpr, mean_tpr)
     plt.plot(mean_fpr, mean_tpr, style,
          label='Mean ROC (area = %0.3f)' % mean_auc, lw=2)
-    plt.axvline(x=.096)
+    plt.axvline(x=30*y.sum()/len(y)) # FPR such that FP:TP = 30:1
     plt.axhline(y=.6)
     plt.xlim([-0.05, 1.05])
     plt.ylim([-0.05, 1.05])
-    plt.xlabel('False Positive Rate (of ~35,000 addresses)')
-    plt.ylabel('True Positive Rate (of ~100 addresses)')
+    plt.xlabel('False Positive Rate (of {} addresses)'.format(len(y)))
+    plt.ylabel('True Positive Rate (of {} addresses)'.format(sum(y)))
     plt.title('ROC curve')
     plt.legend(loc="lower right")
     plt.show()

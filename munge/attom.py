@@ -26,12 +26,11 @@ def find_nearby(match, df):
     df_near = df[(df['PropertyLatitude'] > lat_min) & (df['PropertyLatitude'] < lat_max) & (df['PropertyLongitude'] > lon_min) & (df['PropertyLongitude'] < lon_max)]
     return df_near
 
-def find_in_radius(match, df_near):
-    radius = .3
+def find_in_radius(match, df_near, radius):
     # print(match['latitude'], match['longitude'], df_near.shape[0])
     df_near['distance'] = df_near.apply(lambda row: get_distance(row, match['latitude'], match['longitude']), axis=1).fillna(radius + .1)
     df_near['true_distance'] = df_near.apply(lambda row: get_distance(row, match['true_latitude'], match['true_longitude']), axis=1)
-    radius_df = df_near[df_near['distance'] <= radius]
+    radius_df = df_near.loc[df_near['distance'] <= radius]
     return radius_df
 
 def test_address(address, target):
@@ -59,7 +58,7 @@ def alternate_matching(address, target):
 
 def find_matches(df_row):
     nearby_df = find_nearby(df_row, tax_df) #find properties +/- lat, lon tolerance to minimize distance calculations...
-    radius_df = find_in_radius(df_row, nearby_df) #then find the subset of those properties within 500m
+    radius_df = find_in_radius(df_row, nearby_df, radius = .51) #then find the subset of those properties within 500m
     closest = radius_df[radius_df['true_distance'] <= .05] #we'll look within 50m of true address to find a match in the tax assessor data.
     target = df_row['street_address'].split()
     attom_matches = []
@@ -115,7 +114,7 @@ def append_neighbors(airbnb_df, tax_df):
     for idx, row in airbnb_df.iterrows():
         print(row['title'])
         nearby_df = find_nearby(row, tax_df) #find properties +/- lat, lon tolerance to minimize distance calculations...
-        radius_df = find_in_radius(row, nearby_df) #then find the subset of those properties within 500m
+        radius_df = find_in_radius(row, nearby_df, radius=.3) #then find the subset of those properties within 500m
         radius_df['airbnb_property_id'] = row.loc['airbnb_property_id']
         radius_df['MATCH'] = radius_df['[ATTOM ID]'].apply(lambda x: x == row['attom_id'])
         radius_df['neighbor_count'] = radius_df.shape[0]
@@ -163,7 +162,7 @@ def process_names(df):
 
 if __name__ == '__main__':
     matches_df = pd.read_csv('../data/matches_geo.csv')
-    matches_df = matches_df.query("match_score >= 40 & distance <= .3 & room_type == 'Entire home/apt'")
+    matches_df = matches_df.query("match_score >= 40 & room_type == 'Entire home/apt'")
     print('NUMBER OF POTENTIAL MATCHES: {}'.format(matches_df.shape[0]))
 
     tax_df = pd.read_csv('../data/tax_assessor_denver.csv')
@@ -176,6 +175,7 @@ if __name__ == '__main__':
     single_matches.to_pickle('../data/single_matches.pkl')
 
     validated_matches = pd.read_pickle('../data/single_matches.pkl')
+    validated_matches = validated_matches.query("distance <= .3")
     validated_matches = process_airbnb(validated_matches)
     merged_data = append_neighbors(validated_matches, tax_df)
     merged_data.to_pickle('../data/merged.pkl')

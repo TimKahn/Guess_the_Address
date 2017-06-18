@@ -33,7 +33,8 @@ def get_location(df):
         df['full_address'], df['street_address'], df['zipcode'], df['gmaps_place_id'] = '', '', 0, ''
     df['lat_diff'] = df['true_latitude'] - df['latitude']
     df['lon_diff'] = df['true_longitude'] - df['longitude']
-    df['distance'] = geopy.distance.vincenty((df['true_latitude'], df['true_longitude']), (df['latitude'], df['longitude'])).km
+    df['true_distance'] = geopy.distance.vincenty((df['true_latitude'], df['true_longitude']), (df['latitude'], df['longitude'])).km
+    df['distance'] = 0 #distance of the listing from itself.  Comparison properties will show the distance from the listing to the comp address.
     return df
 
 if __name__ == '__main__':

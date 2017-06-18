@@ -12,7 +12,7 @@ def get_distance(row, lat, lon):
 
 def find_nearby(match, df):
     '''
-    INPUTS: a single VRBO/Homeaway-to-AirBNB matched property; tax assessor data.
+    INPUTS: match: a single VRBO/Homeaway-to-AirBNB matched property; df: tax assessor dataframe.
     OUTPUT: dataframe of properties within a lat/lon tolerance of the property.
     '''
     lat_pad = .005 #lat/lon pads correspond to ~550m.
@@ -27,6 +27,10 @@ def find_nearby(match, df):
     return df_near
 
 def find_in_radius(match, df_near, radius):
+    '''
+    Find all properties within radius (passed to function) of a known match's airbnb lat/lon.
+    Return the properties as radius df, including fields for the distance to the airbnb listing, and the true distance to the correct address.
+    '''
     # print(match['latitude'], match['longitude'], df_near.shape[0])
     df_near['distance'] = df_near.apply(lambda row: get_distance(row, match['latitude'], match['longitude']), axis=1)
     df_near['true_distance'] = df_near.apply(lambda row: get_distance(row, match['true_latitude'], match['true_longitude']), axis=1)
@@ -103,11 +107,9 @@ def get_val_features(df):
     val_df['validated'] = 0
     val_df['title'] = df.loc[:, 'title']
     val_df['title_crosslist'] = df.loc[:, 'title_crosslist']
-    val_df['airbnb_url'] = urls['AirBNB'].join(df['airbnb_property_id'].astype(str))
-    crosslist_urls = df['crosslisted_on'].apply(lambda x: str(urls[x])).to_frame()
-    property_ids = df['prop_id_crosslist'].astype(str)
-    print(crosslist_urls.shape, property_ids.shape)
-    val_df['crosslist_url'] = crosslist_urls.join(property_ids)
+    val_df['airbnb_url'] = df['airbnb_property_id'].apply(lambda x: '{}{}'.format(urls['AirBNB'], x))
+    crosslist_urls = df['crosslisted_on'].apply(lambda x: str(urls[x]))
+    val_df['crosslist_url'] = crosslist_urls + df['prop_id_crosslist']
     return val_df
 
 def process_airbnb(airbnb_df):
@@ -178,22 +180,25 @@ if __name__ == '__main__':
     # matches_df = matches_df.query("match_score >= 40 & room_type == 'Entire home/apt'")
     # print('NUMBER OF POTENTIAL MATCHES: {}'.format(matches_df.shape[0]))
     #
-    # tax_df = pd.read_csv('../data/tax_assessor_denver.csv')
-    # tax_df = tax_df.loc[tax_df['CompanyFlag'] != 'Y'] #consider dropping this restriction -- use as predictor?
+    tax_df = pd.read_csv('../data/tax_assessor_denver.csv')
+    tax_df = tax_df.loc[tax_df['CompanyFlag'] != 'Y'] #consider dropping this restriction -- use as predictor?
     #
     # matches_df = matches_df.apply(find_matches, axis=1)
     # non_matches = matches_df.loc[matches_df['number_of_matches']==0]
     # single_matches = matches_df.loc[matches_df['number_of_matches']==1]
     # multi_matches = matches_df.loc[matches_df['number_of_matches']>1]
     # single_matches.to_pickle('../data/single_matches.pkl')
+    # validation_data = get_val_features(single_matches)
+    # validation_data.to_csv('../data/validation.csv')
 
-    single_matches = pd.read_pickle('../data/single_matches.pkl')
-    validation_data = get_val_features(single_matches)
+    single_matches = pd.read_pickle('../data/single_matches.pkl').reset_index()
+    manually_validated = pd.read_csv('../data/manually_validated.csv')
+    single_matches['validated'] = manually_validated.loc[:, 'validated']
+    validated_matches = single_matches.query('validated==1')
 
-    # validated_matches = pd.read_pickle('../data/single_matches.pkl')
-    # radius = .2
-    # validated_matches = validated_matches[validated_matches['distance'] <= radius]
-    # validated_matches = process_airbnb(validated_matches)
-    # merged_data = append_neighbors(validated_matches, tax_df, radius)
-    # merged_data = process_names(merged_data)
-    # merged_data.to_csv('../data/merged.csv')
+    radius = .5
+    validated_matches = validated_matches[validated_matches['distance'] <= radius]
+    validated_matches = process_airbnb(validated_matches)
+    merged_data = append_neighbors(validated_matches, tax_df, radius)
+    merged_data = process_names(merged_data)
+    merged_data.to_csv('../data/merged.csv')

@@ -8,6 +8,7 @@ from imblearn.over_sampling import SMOTE, RandomOverSampler
 import numpy as np
 import roc_curve2 as rc2
 import profit
+import profit_avg
 import split
 import matplotlib.pyplot as plt
 
@@ -23,5 +24,6 @@ if __name__ == '__main__':
     xg = XGBClassifier(scale_pos_weight=10, max_delta_step=1)
     classifiers = [xg, blag]
     balancing = []
-    profit.plot_all_profits(xg)
+    profit_avg.plot_avg_profits(xg)
+    # profit.plot_all_profits(xg)
     # rc2.plot_ROC_curve(classifiers, X, y, balancing=balancing)

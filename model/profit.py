@@ -67,7 +67,7 @@ def plot_model_profits(labels, predicted_probs, revenue, cost, axis):
     # plt.plot(thresholds, profits)
     axis.plot(thresholds, profits*pred_positive_rates*10000)
 
-def plot_all_profits(classifier, revenue=100, cost=.5):
+def plot_all_profits(classifier, revenue=100, cost=.25):
     plt.close('all')
     fig = plt.figure(figsize=(10,8))
     ax1 = fig.add_subplot(1,1,1)

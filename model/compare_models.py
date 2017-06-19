@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
     plt.close('all')
-    X, y = split.get_split()
+    X, y = split.get_xy()
     ros = RandomOverSampler()
     smt = SMOTETomek(ratio=.01)
     sme = SMOTEENN(ratio=.01)

@@ -1,7 +1,9 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+plt.style.use('ggplot')
 from sklearn.metrics import confusion_matrix
+import split
 
 def get_cost_benefit(revenue, cost):
     '''
@@ -50,33 +52,33 @@ def profit_curve(predicted_probs, labels, revenue, cost):
         positive = np.sum(y_predict)
         pred_positive_rates.append(positive/y_predict.shape[0])
         confusion_matrix = standard_confusion_matrix(labels, y_predict)
-        threshold_profit = np.sum(confusion_matrix * cost_benefit) / positive #divide by positive to get per-property profit
+        threshold_profit = np.sum(confusion_matrix * cost_benefit) / positive #divide by positive predicitons to get per-property profit
         # print(confusion_matrix)
         # print(threshold_profit)
         # print('----------------')
         profits.append(threshold_profit)
     return np.array(profits), np.array(thresholds), np.array(pred_positive_rates)
 
-def plot_model_profits(cost_fraud, cost_investigate, save_path='static/img/'):
-    """Plotting function to compare profit curves of different models.
-
-    Parameters
-    ----------
-    save_path: str, file path to save the plot to. If provided plot will be saved and not shown.
-    """
-    plt.close('all')
-    labels = get_labels()
+def plot_model_profits(labels, predicted_probs, revenue, cost):
+    labels =
     predicted_probs = get_predicted_probs()
-    profits, thresholds, flag_rates = profit_curve(predicted_probs, labels, cost_fraud, cost_investigate)
+    profits, thresholds, pred_positive_rates = profit_curve(predicted_probs, labels, cost_fraud, cost_investigate)
     # percentages = np.linspace(0, 100, profits.shape[0])
     # plt.plot(thresholds, profits)
     fig = plt.figure(figsize=(10,8))
     ax1 = fig.add_subplot(1,1,1)
-    ax1.plot(thresholds, profits*flag_rates*10000)
+    ax1.plot(thresholds, profits*pred_positive_rates*10000)
+
+def plot_all_profits():
+    plt.close('all')
+    X, y = split.get_xy()
     plt.title("Profit Curve")
-    plt.xlabel("Flag case if fraud probability is greater than...")
+    plt.xlabel("Model's Probability of a Match")
     plt.ylabel("Profit per 10,000 events")
     # plt.legend(loc='best')
     plt.tight_layout()
-    plt.savefig(save_path+str(cost_fraud)+'_'+str(cost_investigate)+'.png')
+    plt.show()
     return
+
+if __name__ == '__main__':
+    plot_all_profits()

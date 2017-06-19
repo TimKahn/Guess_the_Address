@@ -1,7 +1,7 @@
 from sklearn.model_selection import train_test_split
 import pandas as pd
 
-def get_split():
+def get_xy():
     df = pd.read_csv('../data/featurized_data.csv')
     # print(df.info())
     identifiers = df.loc[:, ['attom_id', 'airbnb_property_id', 'airbnb_host_id', 'first_name', 'first_name2', 'title']]

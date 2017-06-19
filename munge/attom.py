@@ -195,6 +195,7 @@ if __name__ == '__main__':
     manually_validated = pd.read_csv('../data/manually_validated.csv')
     single_matches['validated'] = manually_validated.loc[:, 'validated']
     validated_matches = single_matches.query('validated==1')
+    validated_matches.to_csv('../data/final_validated.csv')
 
     radius = .5
     validated_matches = validated_matches[validated_matches['listing_distance'] <= radius]

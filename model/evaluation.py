@@ -43,8 +43,8 @@ def plot_ROC_curve(classifier, X, y, style, pos_label=1, n_folds=5):
     mean_auc = auc(mean_fpr, mean_tpr)
     plt.plot(mean_fpr, mean_tpr, style,
          label='Mean ROC (area = %0.3f)' % mean_auc, lw=2)
-    plt.axvline(x=30*y.sum()/len(y)) # FPR such that FP:TP = 30:1
-    plt.axhline(y=.6)
+    plt.axvline(x=30*y.sum()/len(y), label='30:1 FP/TP ratio') # FPR such that FP:TP = 30:1
+    plt.axhline(y=.6, color='black')
     plt.xlim([-0.05, 1.05])
     plt.ylim([-0.05, 1.05])
     plt.xlabel('False Positive Rate (of {} addresses)'.format(len(y)))

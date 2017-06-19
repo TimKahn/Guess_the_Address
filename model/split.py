@@ -13,4 +13,4 @@ def get_xy():
     return X, y
 
 if __name__ == '__main__':
-    get_split()
+    get_xy()

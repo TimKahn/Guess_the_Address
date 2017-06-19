@@ -43,52 +43,42 @@ def profit_curve(predicted_probs, labels, revenue, cost, thresholds):
     profits    : ndarray - 1D
     thresholds : ndarray - 1D
     """
-    # n_obs = float(len(labels))
-    n_obs = len(labels)
+    actual_positives = float(sum(labels))
     cost_benefit = get_cost_benefit(revenue, cost)
-    # thresholds = np.linspace(.01, 1, 200)
     profits = []
     pred_positive_rates = []
     for threshold in thresholds:
         y_predict = np.array([1 if p >= threshold else 0 for p in predicted_probs])
-        positive = np.sum(labels)
-        negative = len(labels) - positive
-        pred_positive_rates.append(positive/y_predict.shape[0])
         confusion_matrix = standard_confusion_matrix(labels, y_predict)
-        confusion_rates = 
-        threshold_profit = np.sum(confusion_rates * cost_benefit) #divide by positive predicitons to get per-property profit
+        threshold_profit = np.sum(confusion_matrix * cost_benefit)/actual_positives #divide by n_obs to get 'per observation' profit
         # print(confusion_matrix)
         # print(threshold_profit)
         # print('----------------')
         profits.append(threshold_profit)
-    return np.array(profits), np.array(pred_positive_rates)
+    return np.array(profits)
 
-def plot_model_profits(labels, predicted_probs, revenue, cost, axis):
-    profits, thresholds, pred_positive_rates = profit_curve(predicted_probs, labels, revenue, cost)
-    # percentages = np.linspace(0, 100, profits.shape[0])
-    # plt.plot(thresholds, profits)
-    # axis.plot(thresholds, profits*pred_positive_rates*10000)
-    pass
-
-def plot_avg_profits(classifier, n_splits=5, revenue=100, cost=4):
+def plot_avg_profits(classifier, n_splits=5, revenue=50, cost=1.50):
     plt.close('all')
     fig = plt.figure(figsize=(10,8))
     ax1 = fig.add_subplot(1,1,1)
     X, y = split.get_xy()
     skf = StratifiedKFold(n_splits=n_splits, random_state=40, shuffle=True)
-    thresholds = np.linspace(.01, 1, 200)
-    avg_profits, avg_pred_pos = np.zeros(len(thresholds)), np.zeros(len(thresholds))
+    thresholds = np.linspace(.05, 1, 200)
+    avg_profits = np.zeros(len(thresholds))
+    i=1
     for train, test in skf.split(X, y):
+        print('Predicting fold {}...'.format(i))
         classifier.fit(X[train], y[train])
         predicted_probs = classifier.predict_proba(X[test])[:,1]
-        profits, pred_positive_rates = profit_curve(predicted_probs, y[test], revenue, cost, thresholds)
+        profits = profit_curve(predicted_probs, y[test], revenue, cost, thresholds)
         avg_profits += profits
-        avg_pred_pos += pred_positive_rates
+        i += 1
         # plot_model_profits(y[test], predicted_probs, revenue, cost, ax1)
-    ax1.plot(thresholds, avg_profits*avg_pred_pos*10000)
+    ax1.plot(thresholds, avg_profits*10000)
     plt.title("Profit Curve")
-    plt.xlabel("Percentage")
-    plt.ylabel("Profit per 10,000 addresses tested")
+    plt.xlabel("<-- Classify everything as a match | Classify nothing as a match -->")
+    plt.ylabel("Profit per 10,000 AirBNB properties")
+    plt.ylim([-250000, 1250000])
     # plt.legend(loc='best')
     plt.tight_layout()
     plt.show()

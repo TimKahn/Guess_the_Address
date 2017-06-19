@@ -95,6 +95,10 @@ DESCRIBE RESULTS! >>>
 
 * [“Class Imbalance, Redux”][IC2]. Wallace, Small, Brodley and Trikalinos. IEEE Conf on Data Mining, 2011.  A strong theoretical and empirical justification for undersampling and bagging in imbalanced-class problems.
 
+#### Profit Curves:
+* https://github.com/SydneyLauren/Profit-curves-and-xkcd-plotting/blob/master/Profit_Curves.ipynb
+* Galvanize DSI solutions repo
+
 #### AirBNB-related news:
 * https://motherboard.vice.com/en_us/article/airbnbs-in-a-hot-legal-mess-with-new-york-and-its-not-going-away
 

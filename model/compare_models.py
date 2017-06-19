@@ -24,6 +24,7 @@ if __name__ == '__main__':
     xg = XGBClassifier(scale_pos_weight=10, max_delta_step=1)
     classifiers = [xg, blag]
     balancing = []
+    # profit_avg.plot_avg_profits(blag)
     profit_avg.plot_avg_profits(xg)
     # profit.plot_all_profits(xg)
     # rc2.plot_ROC_curve(classifiers, X, y, balancing=balancing)

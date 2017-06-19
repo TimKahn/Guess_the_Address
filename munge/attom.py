@@ -32,7 +32,9 @@ def find_in_radius(match, df_near, radius):
     Return the properties as radius df, including fields for the distance to the airbnb listing, and the true distance to the correct address.
     '''
     # print(match['latitude'], match['longitude'], df_near.shape[0])
+    # get distance from candidate to listing
     df_near['distance'] = df_near.apply(lambda row: get_distance(row, match['latitude'], match['longitude']), axis=1)
+    # get distance from candidate to actual address.  Used to confirm matches; NOT a predictor for modeling!
     df_near['true_distance'] = df_near.apply(lambda row: get_distance(row, match['true_latitude'], match['true_longitude']), axis=1)
     radius_df = df_near.loc[df_near['distance'] <= radius]
     return radius_df

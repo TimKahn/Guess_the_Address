@@ -3,20 +3,30 @@ from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import auc, roc_auc_score, roc_curve, precision_recall_curve
 from scipy import interp
 import matplotlib.pyplot as plt
-# from imblearn.combine import SMOTETomek, SMOTEENN
-# from imblearn.over_sampling import SMOTE
+plt.style.use('ggplot')
+from imblearn.combine import SMOTETomek, SMOTEENN
+from imblearn.over_sampling import SMOTE
 # from imblearn.under_sampling import TomekLinks, AllKNN
 
-def plot_ROC_curve(classifiers, X, y, balancing=None, pos_label=1, n_folds=5):
+def plot_ROC_curve(classifiers, X, y, balancing=[], pos_label=1, n_folds=5):
     '''
     Classifiers and balancing are lists.
     '''
-    for cl in classifiers:
-        for b in balancing:
-            ROC_curve(cl, X, y)
-    plt.plot([0, 1], [0, 1], '--', color=(0.6, 0.6, 0.6), label='Random')
-    plt.axvline(x=30*y.sum()/len(y), label='30:1 FP/TP ratio') # FPR such that FP:TP = 30:1
-    plt.axhline(y=.6, color='black')
+    print(balancing)
+    if len(balancing) > 0:
+        print('Preprocessing...')
+        for cl in classifiers:
+                for b in balancing:
+                    mean_tpr, mean_fpr, mean_auc = get_ROC_curve(cl, X, y, b)
+                    plt.plot(mean_fpr, mean_tpr, label=cl.__class__.__name__ + ' (area = %0.3f)' % mean_auc, lw=2)
+    else:
+        for cl in classifiers:
+            mean_tpr, mean_fpr, mean_auc = get_ROC_curve(cl, X, y)
+            plt.plot(mean_fpr, mean_tpr, label=cl.__class__.__name__ + ' (area = %0.3f)' % mean_auc, lw=2)
+
+    plt.plot([0, 1], [0, 1], '--', color='black', label='Random')
+    plt.axvline(x=30*y.sum()/len(y), label='30:1 FP/TP ratio', color='grey') # FPR such that FP:TP = 30:1
+    # plt.axhline(y=.6, color='grey')
     plt.xlim([-0.05, 1.05])
     plt.ylim([-0.05, 1.05])
     plt.xlabel('False Positive Rate (of {} addresses)'.format(len(y)))
@@ -25,7 +35,7 @@ def plot_ROC_curve(classifiers, X, y, balancing=None, pos_label=1, n_folds=5):
     plt.legend(loc="lower right")
     plt.show()
 
-def ROC_curve(classifier, X, y, balancing=None, pos_label=1, n_folds=5):
+def get_ROC_curve(classifier, X, y, balancing=None, pos_label=1, n_folds=5):
     mean_tpr = 0.0
     mean_fpr = np.linspace(0, 1, 100)
     all_tpr = []
@@ -33,13 +43,8 @@ def ROC_curve(classifier, X, y, balancing=None, pos_label=1, n_folds=5):
     i = 1
     for train, test in skf.split(X, y):
         X_train, y_train = X[train], y[train]
-        # sm = SMOTE()
-        # tmk = TomekLinks()
-        # X_train, y_train = TomekLinks().fit_sample(X_train, y_train)
-        # X_train, y_train = SMOTE().fit_sample(X_train, y_train)
-        # X_train, y_train = AllKNN().fit_sample(X_train, y_train)
-        # X_train, y_train = SMOTETomek(smote=sm, tomek=tmk).fit_sample(X_train, y_train)
-        # X_train, y_train = SMOTEENN().fit_sample(X_train, y_train)
+        if balancing:
+            X_train, y_train = balancing.fit_sample(X_train, y_train)
         classifier.fit(X_train, y_train)
         probas_ = classifier.predict_proba(X[test])
         fpr, tpr, thresholds = roc_curve(y[test], probas_[:, 1], pos_label=1)
@@ -52,8 +57,7 @@ def ROC_curve(classifier, X, y, balancing=None, pos_label=1, n_folds=5):
     mean_tpr /= n_folds
     mean_tpr[-1] = 1.0
     mean_auc = auc(mean_fpr, mean_tpr)
-    plt.plot(mean_fpr, mean_tpr, label='Mean ROC (area = %0.3f)' % mean_auc, lw=2)
-    return
+    return mean_tpr, mean_fpr, mean_auc
 
 def plot_PR_curve(classifier, X, y, n_folds=5):
     skf = StratifiedKFold(n_splits=n_folds, random_state=40, shuffle=True)

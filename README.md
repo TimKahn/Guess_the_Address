@@ -49,7 +49,7 @@ Swimming pool in tax assessor data
 
 **Negative Class (non-matches):**
 
- * I keep -- intially -- every property in the tax assessor data located within 500m of one of the matches, then determine the model features for each by comparison to the AirBNB property.  This generates hundreds of non-matches (negative class) for every match; an average of 989 'non-matches' for every match!
+ * I keep -- intially -- every property in the tax assessor data located within 500m of one of the matches, then determine the model features for each by comparison to the AirBNB property.  This generates hundreds of non-matches (negative class) for every match; an average of 834 'non-matches' for every match!
 
 ### Exploratory Data Analysis
 
@@ -67,7 +67,7 @@ Swimming pool in tax assessor data
 
 ### Model Selection
 
-* Given the severely imbalanced classes, I favor recall over precision (at least to a point); much like fraud detection, even if I have many false positives for every true positive, I've turned this needle-in-a-haystack (1-in-989). problem in to one that could be solved reasonably via human review.  An initial attempt at a manual process by AirDNA identified 30% of properties in a sample, so this serves as a baseline for recall.
+* Given the severely imbalanced classes, I favor recall over precision (at least to a point); much like fraud detection, even if I have many false positives for every true positive, I've turned this needle-in-a-haystack (1-in-834). problem in to one that could be solved reasonably via human review.  An initial attempt at a manual process by AirDNA identified 30% of properties in a sample, so this serves as a baseline for recall.
 
 * Ideally, the models will be benchmarked via profit curves, with an AirDNA estimate of the profit potential, and cost being based on Mechanical Turk cost to review each case that was predicted positive (match).
 

@@ -51,15 +51,12 @@
 * AdaBoostClassifier is decent.  Baseline?  Show SVC/SVM?
 
 #### 6.17.2017 Saturday goals
-* Use EM on distance, manually validate.
-* Profit curve, distribution of houses (rough)
 * Mechanical Turk research.
 
 #### 6.18.2017 Sunday goals
 * Resume, LinkedIn, presentation skeleton, readme.
 * Feature importance / overfitting concerns.
 * Questions for Scott & Dan.
-* Undersampling, SMOTE.
 
 #### Visuals
 * Scatter plot - indoor fireplace
@@ -73,6 +70,7 @@
 #### Areas to improve
 * Model is reliant on finding cross-listed properties, which could be too few to train a model (esp. outside major cities).  I have code to find the most likely cross-listings, and it does fairly well, but they must be manually validated.  I do not want this data to be a prediction, as it would put incorrect matches in my tiny positive class.
 * Current MVP trusts the lat, lon in the attom data.
+* Tax assessor data can vary across counties / municipalities.
 * I exclude private room listings from this model.
 * Company flag or not?  Make this a predictor if included?
 * Some properties are seemingly not in the tax assessor database.  What proportion?  Is there any remedy?

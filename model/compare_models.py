@@ -22,9 +22,8 @@ if __name__ == '__main__':
     adb = AdaBoostClassifier(random_state=42)
     blag = BlaggingClassifier(base_estimator=DecisionTreeClassifier(criterion='entropy', max_features=.5), n_estimators=200, random_state=42, n_jobs=-1)
     xg = XGBClassifier(scale_pos_weight=10, max_delta_step=1)
-    classifiers = [xg, blag]
+    classifiers = [blag, xg]
     balancing = []
     # profit_avg.plot_avg_profits(blag)
     profit_avg.plot_avg_profits(xg)
-    # profit.plot_all_profits(xg)
     # rc2.plot_ROC_curve(classifiers, X, y, balancing=balancing)

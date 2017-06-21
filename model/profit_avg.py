@@ -50,14 +50,14 @@ def profit_curve(predicted_probs, labels, revenue, cost, thresholds):
     for threshold in thresholds:
         y_predict = np.array([1 if p >= threshold else 0 for p in predicted_probs])
         confusion_matrix = standard_confusion_matrix(labels, y_predict)
-        threshold_profit = np.sum(confusion_matrix * cost_benefit)/actual_positives #divide by n_obs to get 'per observation' profit
+        threshold_profit = np.sum(confusion_matrix * cost_benefit)/actual_positives #divide # of AirBNB properties we're testing
         # print(confusion_matrix)
         # print(threshold_profit)
         # print('----------------')
         profits.append(threshold_profit)
     return np.array(profits)
 
-def plot_avg_profits(classifier, n_splits=5, revenue=50, cost=1.50):
+def plot_avg_profits(classifier, n_splits=5, revenue=50, cost=1):
     plt.close('all')
     fig = plt.figure(figsize=(10,8))
     ax1 = fig.add_subplot(1,1,1)
@@ -65,20 +65,21 @@ def plot_avg_profits(classifier, n_splits=5, revenue=50, cost=1.50):
     skf = StratifiedKFold(n_splits=n_splits, random_state=40, shuffle=True)
     thresholds = np.linspace(.05, 1, 200)
     avg_profits = np.zeros(len(thresholds))
-    i=1
+    i=0
     for train, test in skf.split(X, y):
+        i += 1
         print('Predicting fold {}...'.format(i))
         classifier.fit(X[train], y[train])
         predicted_probs = classifier.predict_proba(X[test])[:,1]
         profits = profit_curve(predicted_probs, y[test], revenue, cost, thresholds)
         avg_profits += profits
-        i += 1
         # plot_model_profits(y[test], predicted_probs, revenue, cost, ax1)
+    avg_profits = avg_profits/i #divide by number of folds
     ax1.plot(thresholds, avg_profits*10000)
-    plt.title("Profit Curve")
-    plt.xlabel("<-- Classify everything as a match | Classify nothing as a match -->")
-    plt.ylabel("Profit per 10,000 AirBNB properties")
-    plt.ylim([-250000, 1250000])
+    # plt.title("Profit Curve")
+    # plt.xlabel("<-- Classify everything as a match | Classify nothing as a match -->")
+    # plt.ylabel("$ Profit per 10,000 AirBNB properties")
+    plt.ylim([-50000, 150000])
     # plt.legend(loc='best')
     plt.tight_layout()
     plt.show()

@@ -1,7 +1,6 @@
 import pandas as pd
 
 '''FEATURES:
-zipcode
 neighbor_count: Number of 'neighbors' in radius
 lat_offset: Difference in latitude (AirBNB minus Tax Assessor)
 lon_offset: Difference in longitude (AirBNB minus Tax Assessor)
@@ -14,6 +13,8 @@ bath_diff: Bathrooms on AirBNB listing minus Bathrooms in Assessor Data
 name_score: Max similarity scores of AirBNB Host Name(s) and PartyOwner 1 and 2.
 
 CANDIDATES DROPPED:
+zipcode
+accomodates
 pool_a: boolean -- swimming pool in airbnb listing
 pool_t: boolean -- swimming pool in tax assessor data
 AreaBuilding: not useful without 'accomodates' data

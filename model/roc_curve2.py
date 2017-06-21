@@ -10,7 +10,11 @@ from imblearn.over_sampling import SMOTE
 
 def plot_ROC_curve(classifiers, X, y, balancing=[], pos_label=1, n_folds=5):
     '''
-    Classifiers and balancing are lists.
+    Input:
+    -classifiers is a list of sklearn classifier objects
+    -balancing is a list of sklearn over- and undersampling techniques
+    Output:
+    -a single plot with ROC curves for all balancing-classifier combinations
     '''
     print(balancing)
     if len(balancing) > 0:
@@ -18,24 +22,28 @@ def plot_ROC_curve(classifiers, X, y, balancing=[], pos_label=1, n_folds=5):
         for cl in classifiers:
                 for b in balancing:
                     mean_tpr, mean_fpr, mean_auc = get_ROC_curve(cl, X, y, b)
-                    plt.plot(mean_fpr, mean_tpr, label=cl.__class__.__name__ + ' (area = %0.3f)' % mean_auc, lw=2)
+                    plt.plot(mean_fpr, mean_tpr, label=cl.__class__.__name__ + ' (AUC = %0.3f)' % mean_auc, lw=2)
     else:
         for cl in classifiers:
             mean_tpr, mean_fpr, mean_auc = get_ROC_curve(cl, X, y)
-            plt.plot(mean_fpr, mean_tpr, label=cl.__class__.__name__ + ' (area = %0.3f)' % mean_auc, lw=2)
+            plt.plot(mean_fpr, mean_tpr, label=cl.__class__.__name__ + ' (AUC = %0.3f)' % mean_auc, lw=2)
 
     plt.plot([0, 1], [0, 1], '--', color='black', label='Random')
-    plt.axvline(x=30*y.sum()/len(y), label='30:1 FP/TP ratio', color='grey') # FPR such that FP:TP = 30:1
+    plt.axvline(x=50*y.sum()/len(y), label='50:1 FP/TP ratio', color='grey') # FPR such that FP:TP = 30:1
     # plt.axhline(y=.6, color='grey')
     plt.xlim([-0.05, 1.05])
     plt.ylim([-0.05, 1.05])
-    plt.xlabel('False Positive Rate (of {} addresses)'.format(len(y)))
-    plt.ylabel('True Positive Rate (of {} addresses)'.format(sum(y)))
-    plt.title('ROC curve')
+    plt.xlabel('FPR, n = 76,601')
+    plt.ylabel('TPR, n = 92')
+    # plt.title('ROC curve')
     plt.legend(loc="lower right")
     plt.show()
 
 def get_ROC_curve(classifier, X, y, balancing=None, pos_label=1, n_folds=5):
+    '''
+    Called by plot_ROC_curve.  Outputs mean ROC curve and mean AUC from n-fold validation
+    on the balancing-classifier pair.
+    '''
     mean_tpr = 0.0
     mean_fpr = np.linspace(0, 1, 100)
     all_tpr = []
@@ -60,6 +68,9 @@ def get_ROC_curve(classifier, X, y, balancing=None, pos_label=1, n_folds=5):
     return mean_tpr, mean_fpr, mean_auc
 
 def plot_PR_curve(classifier, X, y, n_folds=5):
+    '''
+    Plots the average precision-recall curve for a classifier over n-fold cross validation.
+    '''
     skf = StratifiedKFold(n_splits=n_folds, random_state=40, shuffle=True)
     i = 1
     for train, test in skf.split(X, y):

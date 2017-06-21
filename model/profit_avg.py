@@ -79,6 +79,7 @@ def plot_avg_profits(classifier, n_splits=5, revenue=50, cost=1):
         avg_profits += profits
         # plot_model_profits(y[test], predicted_probs, revenue, cost, ax1)
     avg_profits = avg_profits/i #divide by number of folds
+    print('Max profit: {}'.format(avg_profits.max()*10000))
     ax1.plot(thresholds, avg_profits*10000, linewidth=1.4, color='cyan')
     ax1.axhline(y=0, color='red', linestyle='--')
     ax1.spines['bottom'].set_color('grey')
@@ -95,8 +96,9 @@ def plot_avg_profits(classifier, n_splits=5, revenue=50, cost=1):
     plt.ylim([-50000, 150000])
     # plt.legend(loc='best')
     plt.tight_layout()
-    plt.savefig('../visualize/profit2.png', dpi=600, transparent=True)
+    # plt.savefig('../visualize/profit2.png', dpi=600, transparent=True)
+    plt.show()
     return
 
 if __name__ == '__main__':
-    plot_all_profits()
+    plot_avg_profits()

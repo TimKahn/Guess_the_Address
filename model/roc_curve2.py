@@ -16,28 +16,40 @@ def plot_ROC_curve(classifiers, X, y, balancing=[], pos_label=1, n_folds=5):
     Output:
     -a single plot with ROC curves for all balancing-classifier combinations
     '''
-    print(balancing)
+    fig, ax = plt.subplots(figsize=(8,8))
+    plt.rcParams.update({'font.size': 14, 'axes.labelsize': 16, 'xtick.labelsize': 16, 'ytick.labelsize': 16})
     if len(balancing) > 0:
         print('Preprocessing...')
         for cl in classifiers:
                 for b in balancing:
                     mean_tpr, mean_fpr, mean_auc = get_ROC_curve(cl, X, y, b)
-                    plt.plot(mean_fpr, mean_tpr, label=cl.__class__.__name__ + ' (AUC = %0.3f)' % mean_auc, lw=2)
+                    ax.plot(mean_fpr, mean_tpr, label=cl.__class__.__name__ + ' (AUC = %0.3f)' % mean_auc, lw=2)
     else:
         for cl in classifiers:
             mean_tpr, mean_fpr, mean_auc = get_ROC_curve(cl, X, y)
-            plt.plot(mean_fpr, mean_tpr, label=cl.__class__.__name__ + ' (AUC = %0.3f)' % mean_auc, lw=2)
+            ax.plot(mean_fpr, mean_tpr, label=cl.__class__.__name__ + ' (AUC = %0.3f)' % mean_auc, lw=2)
 
-    plt.plot([0, 1], [0, 1], '--', color='black', label='Random')
-    plt.axvline(x=50*y.sum()/len(y), label='50:1 FP/TP ratio', color='grey') # FPR such that FP:TP = 30:1
+
+    ax.plot([0, 1], [0, 1], '--', color='black', label='Random')
+    ax.axvline(x=50*y.sum()/len(y), label='50:1 FP/TP ratio', color='green', linestyle='--') # FPR such that FP:TP = 30:1
     # plt.axhline(y=.6, color='grey')
-    plt.xlim([-0.05, 1.05])
-    plt.ylim([-0.05, 1.05])
-    plt.xlabel('FPR, n = 76,601')
-    plt.ylabel('TPR, n = 92')
+    ax.set_xlim([-0.05, 1.05])
+    ax.set_ylim([-0.05, 1.05])
+    # ax.spines['bottom'].set_color('grey')
+    # ax.xaxis.label.set_color('grey')
+    # ax.tick_params(axis='x', colors='grey')
+    # ax.tick_params(axis='y', colors='grey')
+    # ax.spines['left'].set_color('grey')
+    # ax.yaxis.label.set_color('grey')
+
+    ax.xaxis.labelpad = 15
+    ax.yaxis.labelpad = 15
+
+    ax.set_xlabel('FPR (n = 76,601)', fontsize=18)
+    ax.set_ylabel('TPR (n = 92)', fontsize=18)
     # plt.title('ROC curve')
     plt.legend(loc="lower right")
-    plt.show()
+    plt.savefig('../visualize/best_roc.png', dpi=600, transparent=False)
 
 def get_ROC_curve(classifier, X, y, balancing=None, pos_label=1, n_folds=5):
     '''

@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import StratifiedKFold
 import matplotlib.pyplot as plt
-plt.style.use('ggplot')
+# plt.style.use('ggplot')
 from sklearn.metrics import confusion_matrix
 import split
 
@@ -59,8 +59,12 @@ def profit_curve(predicted_probs, labels, revenue, cost, thresholds):
 
 def plot_avg_profits(classifier, n_splits=5, revenue=50, cost=1):
     plt.close('all')
-    fig = plt.figure(figsize=(10,8))
+    fig = plt.figure(figsize=(9,6))
+    plt.rcParams.update({'font.size': 18})
     ax1 = fig.add_subplot(1,1,1)
+    ax1.grid(False)
+    ax1.spines['top'].set_visible(False)
+    ax1.spines['right'].set_visible(False)
     X, y = split.get_xy()
     skf = StratifiedKFold(n_splits=n_splits, random_state=40, shuffle=True)
     thresholds = np.linspace(.05, 1, 200)
@@ -75,14 +79,23 @@ def plot_avg_profits(classifier, n_splits=5, revenue=50, cost=1):
         avg_profits += profits
         # plot_model_profits(y[test], predicted_probs, revenue, cost, ax1)
     avg_profits = avg_profits/i #divide by number of folds
-    ax1.plot(thresholds, avg_profits*10000)
+    ax1.plot(thresholds, avg_profits*10000, linewidth=1.4, color='cyan')
+    ax1.axhline(y=0, color='red', linestyle='--')
+    ax1.spines['bottom'].set_color('grey')
+    ax1.xaxis.label.set_color('grey')
+    ax1.tick_params(axis='x', colors='grey')
+    ax1.spines['left'].set_color('grey')
+    ax1.yaxis.label.set_color('grey')
+    ax1.tick_params(axis='y', colors='grey')
+    ax1.set_yticks([-50000, 0, 150000])
     # plt.title("Profit Curve")
     # plt.xlabel("<-- Classify everything as a match | Classify nothing as a match -->")
     # plt.ylabel("$ Profit per 10,000 AirBNB properties")
+    plt.xlim([.05, 1])
     plt.ylim([-50000, 150000])
     # plt.legend(loc='best')
     plt.tight_layout()
-    plt.show()
+    plt.savefig('../visualize/profit2.png', dpi=600, transparent=True)
     return
 
 if __name__ == '__main__':

@@ -51,19 +51,11 @@ Swimming pool in tax assessor data
 
  * I keep -- intially -- every property in the tax assessor data located within 500m of one of the matches, then determine the model features for each by comparison to the AirBNB property.  This generates hundreds of non-matches (negative class) for every match; an average of 834 'non-matches' for every match!
 
-### Exploratory Data Analysis
+#### An interesting discovery -- distances of the true addresses from the center of the circle (meters):
 
-#### Distance (km) between center of circle and true address:
+![Distance (km) between center of circle and true address:](visualize/distance_2d.png)
 
-![Distance (km) between center of circle and true address:](visualize/Match_Distances.png)
-
-#### Latitude difference -- center of circle to true address:
-
-![Latitude difference -- center of circle to true address:](visualize/latitude_difference_positive_class.png)
-
-#### Longitude difference -- center of circle to true address:
-
-![Longitude difference -- center of circle to true address:](visualize/longitude_difference_positive_class.png)
+Distance from the center of the circle is clearly not distributed uniformly within the 500m radius -- distance looks like a promising predictor.
 
 ### Model Selection
 

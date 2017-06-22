@@ -1,6 +1,6 @@
 from blagging import BlaggingClassifier
 from sklearn.tree import DecisionTreeClassifier
-# from sklearn.ensemble import GradientBoostingClassifier, AdaBoostClassifier, RandomForestClassifier
+from sklearn.ensemble import GradientBoostingClassifier, AdaBoostClassifier
 from xgboost import XGBClassifier
 import numpy as np
 from sklearn.model_selection import StratifiedKFold
@@ -49,7 +49,7 @@ def plot_ROC_curve(classifier, classifier2, X, y, pos_label=1, n_folds=5):
     plt.axhline(y=.6)
     plt.xlim([-0.05, 1.05])
     plt.ylim([-0.05, 1.05])
-    plt.xlabel('False Positive Rate (of ~35,000 addresses)')
+    plt.xlabel('False Positive Rate (of ~76,000 addresses)')
     plt.ylabel('True Positive Rate (of ~100 addresses)')
     plt.title('ROC curve')
     plt.legend(loc="lower right")
@@ -75,6 +75,7 @@ def plot_PR_curve(classifier, X, y, n_folds=5):
 if __name__ == '__main__':
     plt.close('all')
     X, y = split.get_xy()
+    adb = AdaBoostClassifier(n_estimators=200, learning_rate=.2, random_state=42)
     bc = BlaggingClassifier(base_estimator=DecisionTreeClassifier(criterion='entropy', max_features=.6),n_estimators=200, random_state=42, n_jobs=-1)
     # plot_ROC_curve(bc, X_train, y_train)
     xgb = XGBClassifier()

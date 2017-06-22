@@ -15,16 +15,16 @@ import split
 if __name__ == '__main__':
     X, y = split.get_xy()
     ros = RandomOverSampler()
-    smt = SMOTETomek()
-    sme = SMOTEENN()
+    smt = SMOTETomek(ratio=.1)
+    sme = SMOTEENN(ratio=.1)
     gnb = GaussianNB()
-    rf = RandomForestClassifier(n_estimators=200, weights='balanced_subsample', random_state=42, n_jobs=-1)
+    rf = RandomForestClassifier(n_estimators=200, class_weight = 'balanced_subsample', random_state=42, n_jobs=-1)
     knn = KNeighborsClassifier(n_neighbors=10)
-    adb = AdaBoostClassifier(random_state=42)
+    adb = AdaBoostClassifier(n_estimators=200, learning_rate=.2, random_state=42)
     blag = BlaggingClassifier(base_estimator=DecisionTreeClassifier(criterion='entropy', max_features=.5), n_estimators=200, random_state=42, n_jobs=-1)
     xg = XGBClassifier(scale_pos_weight=10, max_delta_step=1)
-    classifiers = [rf]
-    balancing = [sme]
+    classifiers = [blag, xg]
+    balancing = []
     # profit_avg.plot_avg_profits(blag)
-    # profit_avg.plot_avg_profits(xg)
-    rc2.plot_ROC_curve(classifiers, X, y, balancing=balancing)
+    profit_avg.plot_avg_profits(xg)
+    # rc2.plot_ROC_curve(classifiers, X, y, balancing=balancing)

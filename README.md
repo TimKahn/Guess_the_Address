@@ -16,7 +16,7 @@ AirBNB publishes some basic information in its listings, but not the address -- 
 
 
 * Similar data from Homeaway (VRBO's parent company), provided by AirDNA.
-* Tax assessor data via ATTOM.
+* Tax assessor records for Denver.
 
 ### Data Processing
 Each data point for training/testing is actually a comparison between an AirBNB property and a property from the tax assessor records.  I only considered 'Entire Home' AirBNB listings; 'room' listings often list 1 bed, 1 bath, regardless of house size.  I classify each data point as a 'match' (1) or a 'non-match' (0).  Features considered for modling:

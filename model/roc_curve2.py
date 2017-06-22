@@ -49,7 +49,8 @@ def plot_ROC_curve(classifiers, X, y, balancing=[], pos_label=1, n_folds=5):
     ax.set_ylabel('TPR (n = 92)', fontsize=18)
     # plt.title('ROC curve')
     plt.legend(loc="lower right")
-    plt.savefig('../visualize/best_roc.png', dpi=600, transparent=False)
+    plt.show()
+    # plt.savefig('../visualize/best_roc.png', dpi=600, transparent=False)
 
 def get_ROC_curve(classifier, X, y, balancing=None, pos_label=1, n_folds=5):
     '''

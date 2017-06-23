@@ -16,6 +16,7 @@ def plot_ROC_curve(classifiers, X, y, balancing=[], pos_label=1, n_folds=5):
     Output:
     -a single plot with ROC curves for all balancing-classifier combinations
     '''
+    plt.close('all')
     fig, ax = plt.subplots(figsize=(8,8))
     plt.rcParams.update({'font.size': 14, 'axes.labelsize': 16, 'xtick.labelsize': 16, 'ytick.labelsize': 16})
     if len(balancing) > 0:
@@ -45,8 +46,8 @@ def plot_ROC_curve(classifiers, X, y, balancing=[], pos_label=1, n_folds=5):
     ax.xaxis.labelpad = 15
     ax.yaxis.labelpad = 15
 
-    ax.set_xlabel('FPR (n = 76,601)', fontsize=18)
-    ax.set_ylabel('TPR (n = 92)', fontsize=18)
+    ax.set_xlabel('FPR (n = {})'.format(len(y) - y.sum()), fontsize=18)
+    ax.set_ylabel('TPR (n = {})'.format(y.sum()), fontsize=18)
     # plt.title('ROC curve')
     plt.legend(loc="lower right")
     plt.show()

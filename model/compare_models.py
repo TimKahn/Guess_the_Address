@@ -21,10 +21,11 @@ if __name__ == '__main__':
     rf = RandomForestClassifier(n_estimators=200, class_weight = 'balanced_subsample', random_state=42, n_jobs=-1)
     knn = KNeighborsClassifier(n_neighbors=10)
     adb = AdaBoostClassifier(n_estimators=200, learning_rate=.2, random_state=42)
-    blag = BlaggingClassifier(base_estimator=DecisionTreeClassifier(criterion='entropy', max_features=.5), n_estimators=200, random_state=42, n_jobs=-1)
     xg = XGBClassifier(scale_pos_weight=10, max_delta_step=1)
+    blag = BlaggingClassifier(base_estimator=DecisionTreeClassifier(criterion='entropy', max_features=.5), n_estimators=200, random_state=42, n_jobs=-1)
+    blag_boost = BlaggingClassifier(base_estimator=xg, random_state=42, n_jobs=-1)
     classifiers = [blag, xg]
     balancing = []
     # profit_avg.plot_avg_profits(blag)
-    profit_avg.plot_avg_profits(xg)
-    # rc2.plot_ROC_curve(classifiers, X, y, balancing=balancing)
+    # profit_avg.plot_avg_profits(xg)
+    rc2.plot_ROC_curve(classifiers, X, y, balancing=balancing)

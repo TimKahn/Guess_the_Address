@@ -199,9 +199,9 @@ if __name__ == '__main__':
     validated_matches = single_matches.query('validated==1')
     validated_matches.to_csv('../data/final_validated.csv')
 
-    radius = .5
+    radius = .3
     validated_matches = validated_matches[validated_matches['listing_distance'] <= radius]
     validated_matches = process_airbnb(validated_matches)
     merged_data = append_neighbors(validated_matches, tax_df, radius)
     merged_data = process_names(merged_data)
-    merged_data.to_csv('../data/merged.csv')
+    merged_data.to_csv('../data/merged_300.csv')

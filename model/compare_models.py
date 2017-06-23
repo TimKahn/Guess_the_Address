@@ -16,7 +16,7 @@ if __name__ == '__main__':
     X, y = split.get_xy('../data/featurized_500.csv')
     ros = RandomOverSampler()
     smt = SMOTETomek(ratio=.008)
-    sme = SMOTEENN(ratio=.007)
+    sme = SMOTEENN(ratio=.006)
     # gnb = GaussianNB()
     # rf = RandomForestClassifier(n_estimators=200, class_weight = 'balanced_subsample', random_state=42, n_jobs=-1)
     # knn = KNeighborsClassifier(n_neighbors=10)

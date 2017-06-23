@@ -50,14 +50,14 @@ def profit_curve(predicted_probs, labels, revenue, cost, thresholds):
     for threshold in thresholds:
         y_predict = np.array([1 if p >= threshold else 0 for p in predicted_probs])
         confusion_matrix = standard_confusion_matrix(labels, y_predict)
-        threshold_profit = np.sum(confusion_matrix * cost_benefit)/actual_positives #divide # of AirBNB properties we're testing
+        threshold_profit = np.sum(confusion_matrix * cost_benefit)/actual_positives #divide by number of AirBNB properties we're testing
         # print(confusion_matrix)
         # print(threshold_profit)
         # print('----------------')
         profits.append(threshold_profit)
     return np.array(profits)
 
-def plot_avg_profits(classifier, n_splits=5, revenue=50, cost=1):
+def plot_avg_profits(classifier, filename, n_splits=5, revenue=20, cost=.25):
     plt.close('all')
     fig = plt.figure(figsize=(9,6))
     plt.rcParams.update({'font.size': 18})
@@ -65,7 +65,7 @@ def plot_avg_profits(classifier, n_splits=5, revenue=50, cost=1):
     ax1.grid(False)
     ax1.spines['top'].set_visible(False)
     ax1.spines['right'].set_visible(False)
-    X, y = split.get_xy()
+    X, y = split.get_xy(filename)
     skf = StratifiedKFold(n_splits=n_splits, random_state=40, shuffle=True)
     thresholds = np.linspace(.05, 1, 200)
     avg_profits = np.zeros(len(thresholds))

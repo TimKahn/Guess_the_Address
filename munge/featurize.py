@@ -53,6 +53,6 @@ def get_features(df):
     return featurized_df
 
 if __name__ == '__main__':
-    df = pd.read_csv('../data/merged_300.csv', low_memory=False)
+    df = pd.read_csv('../data/merged_200.csv', low_memory=False)
     featurized_df = get_features(df)
-    featurized_df.to_csv('../data/featurized_300.csv')
+    featurized_df.to_csv('../data/featurized_200.csv')

@@ -58,6 +58,9 @@ def profit_curve(predicted_probs, labels, revenue, cost, thresholds):
     return np.array(profits)
 
 def plot_avg_profits(classifier, filename, n_splits=5, revenue=20, cost=.25):
+    '''
+    Plots the average profit curve across n-fold validation of a model
+    '''
     plt.close('all')
     fig = plt.figure(figsize=(9,6))
     plt.rcParams.update({'font.size': 18})

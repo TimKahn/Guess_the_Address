@@ -13,7 +13,7 @@ def plot_ROC_curve(classifier, classifier2, X, y, pos_label=1, n_folds=5):
     mean_tpr = 0.0
     mean_fpr = np.linspace(0, 1, 100)
     all_tpr = []
-    skf = StratifiedKFold(n_splits=n_folds, random_state=42, shuffle=True)
+    skf = StratifiedKFold(n_splits=n_folds, random_state=40, shuffle=True)
     i = 1
     for train, test in skf.split(X, y):
         classifier.fit(X[train], y[train])
@@ -78,5 +78,5 @@ if __name__ == '__main__':
     adb = AdaBoostClassifier(n_estimators=200, learning_rate=.2, random_state=42)
     bc = BlaggingClassifier(base_estimator=DecisionTreeClassifier(criterion='entropy', max_features=.6),n_estimators=200, random_state=42, n_jobs=-1)
     # plot_ROC_curve(bc, X_train, y_train)
-    xgb = XGBClassifier()
-    plot_ROC_curve(xgb, bc, X, y)
+    xg = XGBClassifier(scale_pos_weight=10, max_delta_step=1, colsample_bytree=1, colsample_bylevel=.5, seed=42)
+    plot_ROC_curve(xg, bc, X, y)

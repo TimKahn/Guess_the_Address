@@ -13,12 +13,12 @@ def plot_benchmarks(ax, mean_fpr, mean_tpr, fp_tp_ratio, benchmarks):
         benchmark = np.where(np.logical_and(fp_tp_ratio >= benchmarks[0], fp_tp_ratio <= benchmarks[1]))
         ax.scatter(mean_fpr[benchmark][[0,-1]], mean_tpr[benchmark][[0,-1]], color='black', zorder=2)
         for fpr, ratio in zip(mean_fpr[benchmark][[0,-1]], fp_tp_ratio[benchmark][[0,-1]]):
-            ax.annotate('FP/TP = {}:1'.format(int(ratio*100)), (fpr, ratio), xytext=(5,-10), textcoords='offset points', fontsize=12)
+            ax.annotate('FP:TP = {}:1'.format(int(ratio*100)), (fpr, ratio), xytext=(5,-10), textcoords='offset points', fontsize=12)
         # ax.plot(mean_fpr[benchmark], fp_tp_ratio[benchmark], color='blue', label='FP/TP', linewidth=.8)
         ax.vlines(mean_fpr[benchmark][[0,-1]], ymin=fp_tp_ratio[benchmark][[0,-1]], ymax=mean_tpr[benchmark][[0,-1]], color='black', linestyle='--', linewidth=.8)
     return
 
-def plot_ROC_curve(classifiers, X, y, benchmarks=None, balancing=[], pos_label=1, n_folds=5, filename=None):
+def plot_ROC_curve(classifiers, X, y, benchmarks=None, balancing=[], pos_label=1, n_folds=5, save_path=None):
     '''
     Input:
     -classifiers is a list of sklearn classifier objects
@@ -61,8 +61,8 @@ def plot_ROC_curve(classifiers, X, y, benchmarks=None, balancing=[], pos_label=1
     ax.set_ylabel('TPR (n = {})'.format(y.sum()), fontsize=18)
     # plt.title('ROC curve')
     plt.legend(loc="lower right")
-    if filename:
-        plt.savefig(filename, dpi=600, transparent=False)
+    if save_path:
+        plt.savefig(save_path, dpi=600, transparent=False)
     else:
         plt.show()
 

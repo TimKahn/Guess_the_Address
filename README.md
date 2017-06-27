@@ -92,9 +92,9 @@ Profit curve for a scenario where AirDNA sells one $50 market report for every f
 
 Notes:
 
-    1. The model can be profitable as-is: we can reduce the number of candidates from 833 per listing (review cost: over $200) to under 50 per listing (review cost: under $12.50).
+* The model can be profitable as-is: we can reduce the number of candidates from 833 per listing (review cost: over $200) to under 50 per listing (review cost: under $12.50).
 
-    2. However, this scenario requires us to accept recall of approximately 50%.  If downstream refinements could be made to further narrow the candidate pool produced by this model, or to reduce manual review time to 30 seconds, 75% recall would be attainable.
+* However, this scenario requires us to accept recall of approximately 50%.  If downstream refinements could be made to further narrow the candidate pool produced by this model, or to reduce manual review time to 30 seconds, 75% recall would be attainable.
 
 #### Future Work
 * The model should be re-trained and tested in other counties to see if it is robust to regional differences.  On the bright side, ~60% of AirBNB listings are suburban to rural; the model is likely to perform better in less dense areas.

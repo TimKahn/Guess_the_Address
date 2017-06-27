@@ -8,7 +8,6 @@ from imblearn.combine import SMOTETomek, SMOTEENN
 from imblearn.over_sampling import SMOTE, RandomOverSampler
 import numpy as np
 import roc_curve2 as rc2
-import profit
 import profit_avg
 import split
 
@@ -30,5 +29,5 @@ if __name__ == '__main__':
     classifiers = [xg]
     balancing = []
     # profit_avg.plot_avg_profits(blag, filename, revenue=50, cost=1)
-    # profit_avg.plot_avg_profits(xg, filename, revenue=50, cost=1)
-    rc2.plot_ROC_curve(classifiers, X, y, balancing=balancing, benchmarks=(.4, .7), save_path='../visualize/roc_xg_benchmarked.png')
+    profit_avg.plot_avg_profits(xg, filename, revenue=12.50, cost=.25)
+    # rc2.plot_ROC_curve(classifiers, X, y, balancing=balancing, benchmarks=(.4, .7), save_path='../visualize/roc_xg_benchmarked.png')

@@ -4,9 +4,9 @@ import numpy as np
 import split
 
 if __name__ == '__main__':
-    X, X_val, y, y_val = split.get_split()
+    X, y = split.get_xy()
     ifo = IsolationForest(n_estimators=250, contamination=.2, n_jobs=-1, random_state=42)
-    skf = StratifiedKFold(n_splits=5, random_state=42, shuffle=True)
+    skf = StratifiedKFold(n_splits=5, random_state=40, shuffle=True)
     for train, test in skf.split(X, y):
         ifo.fit(X[train], y[train])
         predictions = ifo.predict(X[test])

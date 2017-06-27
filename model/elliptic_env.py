@@ -8,10 +8,10 @@ import sklearn.metrics as skm
 if __name__ == '__main__':
     # Note!  Using dummy variables may create a singular covariance matrix.  If so, remove logic to create dummies from ../munge/featurize.py
     scaler = StandardScaler()
-    X, X_test, y, y_test = split.get_split()
+    X, y = split.get_xy('../data/featurized_300.csv')
     X = scaler.fit_transform(X)
     ee = EllipticEnvelope(contamination=.02)
-    skf = StratifiedKFold(n_splits=3, random_state=42, shuffle=True)
+    skf = StratifiedKFold(n_splits=5, random_state=40, shuffle=True)
     for train, test in skf.split(X, y):
         ee.fit(X[train], y[train])
         predictions = ee.predict(X[test])

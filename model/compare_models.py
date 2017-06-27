@@ -26,8 +26,8 @@ if __name__ == '__main__':
     blag = BlaggingClassifier(base_estimator=dtc, n_estimators=200, random_state=42, n_jobs=-1)
     xg2 = XGBClassifier(scale_pos_weight=10, max_delta_step=1, colsample_bytree=1, colsample_bylevel=.5, seed=42)
     blag_boost = BlaggingClassifier(base_estimator=xg2, random_state=42, n_jobs=-1)
-    classifiers = [xg]
+    classifiers = [xg2]
     balancing = []
     # profit_avg.plot_avg_profits(blag, filename, revenue=50, cost=1)
-    profit_avg.plot_avg_profits(xg, filename, revenue=12.50, cost=.25)
-    # rc2.plot_ROC_curve(classifiers, X, y, balancing=balancing, benchmarks=(.4, .7), save_path='../visualize/roc_xg_benchmarked.png')
+    # profit_avg.plot_avg_profits(xg, filename, revenue=12.50, cost=.25)
+    rc2.plot_ROC_curve(classifiers, X, y, balancing=balancing, benchmarks=(.4, .7), save_path='../visualize/roc_xg_benchmarked.png')

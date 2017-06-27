@@ -83,12 +83,12 @@ Note that performance is nearly identical up to ~75% recall.  Let's analyze the 
 #### True Positive to False Positive ratios: XGBoost
 ![Benchmarked ROC curve: XGBoost](visualize/roc_xg_benchmarked.png)
 
-I've plotted points corresponding to two False-Positive/True-Positive ratios above, on an ROC curve for the XGBoost model.  Note that a 42:1 ratio gets us better than 50% recall, but we must accept a significantly higher ratio (68:1) to surpass 75% recall.  Clearly, the model is much better than random, and either of those TP:FP benchmarks represents a model threshold that discards over 90% of the negative class.  However, the ultimate proportion of addresses identified will depend on a different process, and if that process is manual (say, comparing photos), its cost will be crucial in determining what false-to-true-positive ratio we can accept.
+I've plotted points corresponding to two False-Positive/True-Positive ratios above, on an ROC curve for the XGBoost model.  Note that a 42:1 ratio gets us better than 50% recall, but we must accept a significantly higher ratio (68:1) to surpass 75% recall.  Clearly, the model is much better than random, and either of those FP:TP benchmarks is a 90%+ improvement over our original ratio of 833:1.  However, the ultimate proportion of addresses identified will also depend on a secondary process, and if that process is manual (say, comparing photos), its cost will be crucial in determining what false-to-true-positive ratio we can accept.
 
 #### Profit curve: XGBoost
 ![Profit curve:](visualize/profit3.png)
 
-Profit curve for a scenario where AirDNA sells one $50 market report for every four properties I correctly identify, for an average revenue of $12.50 per property.  Assume that we pay someone $15/hour to compare photos of candidate properties to photos from the listing and find the correct match: allowing one minute to review each candidate, our cost is $0.25 per review.  We can construct similar curves for different scenarios to find the best decision threshold for the model in each context.
+Profit curve for a scenario where AirDNA sells one $50 market report for every four properties I correctly identify, for an average revenue of $12.50 per property.  Assume that we pay someone $15/hour to compare photos of candidate properties to photos from the listing and find the correct match: allowing one minute to review each candidate, our cost is $0.25 per review.  We can construct similar curves for different scenarios to find the best classification threshold in each context.
 
 Notes:
 

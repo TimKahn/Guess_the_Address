@@ -1,7 +1,7 @@
 # Address Prediction for AirDNA
 
 ### Overview
-This project aims to find the exact address of AirBNB listings, or at least, to sufficiently narrow the pool of potential candidates that the problem becomes tractable through a secondary, possibly manual, process.  Why?  AirDNA has an automated valuation model, 'The Rentalizer', that forecasts the revenue potential of a property if it were used as a full-time AirBNB rental.  It currently looks at three nearby properties as 'comps' to provide the forecast, but this method leaves a lot uncertain because it relies only on the information in the AirBNB listing!  AirBNB hosts fudge the numbers for bedrooms and bathrooms; we can't be sure of the square footage, age of the house, size of the yard, proximity to a busy street, etc.  We would feel much more confident in that revenue forecast if it were benchmarked against more reliable property information -- say, from public Tax Assessor records.  And in order to find the correct record, we need the correct address.
+This project aims to find the exact address of AirBNB listings, or at least, to sufficiently narrow the pool of potential candidates that the problem becomes tractable through a secondary, possibly manual, process.  Why?  AirDNA has an automated valuation model, ['The Rentalizer'](https://www.airdna.co/rentalizer), that forecasts the revenue potential of a property if it were used as a full-time AirBNB rental.  It currently looks at three nearby properties as 'comps' to provide the forecast, but this method leaves a lot uncertain because it relies only on the information in the AirBNB listing!  AirBNB hosts fudge the numbers for bedrooms and bathrooms; we can't be sure of the square footage, age of the house, size of the yard, proximity to a busy street, etc.  We would feel much more confident in that revenue forecast if it were benchmarked against more reliable property information -- say, from public Tax Assessor records.  And in order to find the correct record, we need the correct address.
 
 ### Challenge / Goal
 AirBNB publishes some basic information in its listings, but not the address -- you only get an address when you book a stay.  Maps on the AirBNB website show the general vicinity of the property as a circle (see below), not as a point; the actual location of the property is randomized within the circle.  In the case of my Denver dataset, this 500m-radius circle contained an average of 833 properties.  For any given AirBNB listing, only one of those 833 properties correctly matches the listing!  My goal is to 'predict' the addresses by comparing features of AirBNB listings to other data (e.g., from public tax assessor records), and provide a cost-benefit framework for analyzing the results.  As a starting point, we can confirm a handful of AirBNB addresses by looking at properties cross-listed on Homeaway/VRBO -- unlike AirBNB, these services show exact map locations for many properties.
@@ -12,27 +12,27 @@ AirBNB publishes some basic information in its listings, but not the address -- 
 * AirDNA's proprietary data for Denver, which includes data for most AirBNB listings.
 * VRBO data that I scraped, including listing title, latitude, and longitude.  VRBO (Vacation Rental By Owner) is a service similar to AirBNB.
 
- * Data was scraped by noting that searching by moving the map generates a JSON object, which in turn specifies the updated map.  Iterate through some parameters in the URL for the JSON, and voila, you've got data for the entire city. See [Ian London's Blog.](https://ianlondon.github.io/blog/web-scraping-discovering-hidden-apis/)
+ * VRBO scraping: searching by moving the map on VRBO.com generates a JSON object, which in turn specifies the updated map.  Iterate through some parameters in the URL to generate JSON objects for properties progressively further from downtown, and you've got listing data for the entire city. See [Ian London's Blog.](https://ianlondon.github.io/blog/web-scraping-discovering-hidden-apis/)
 
 * Similar data from Homeaway (VRBO's parent company), provided by AirDNA.
 * Tax assessor records for Denver.
 
 ### Data Processing
-Each data point for training/testing is actually a comparison between an AirBNB property and a property from the tax assessor records.  I only considered 'Entire Home' AirBNB listings; private and shared room listings often list 1 bed, 1 bath, regardless of house size.  I classify each data point as a 'match' (1) or a 'non-match' (0).  Features considered for modeling:
+Each data point for training/testing is actually a comparison between an AirBNB property and a property from the tax assessor records.  I only considered 'Entire Home' AirBNB listings; private and shared room listings often list 1 bed, 1 bath, regardless of house size.  I classify each data point as a 'match' (1) or a 'non-match' (0).  I considered the following features; in the final models, only those marked with an asterisk are included as features.
 ```
-Number of 'neighbors' in radius
+Number of 'neighbors' in radius*
 Has unit number
 Air conditioning in both AirBNB and Tax Assessor data (henceforth 'in both datasets')
 Heating in both both datasets
-Indoor fireplace in both datasets
+Indoor fireplace in both datasets*
 Pets, elevator, pool, gym in AirBNB data
-Similarity scores of AirBNB Host Name(s) and PartyOwner (1 & 2) via WhosWho package
-Bedrooms on AirBNB listing
-Bedrooms on AirBNB listing - Bedrooms in Assessor Data
-Bathrooms on AirBNB listing
-Bathrooms on AirBNB listing - Bathrooms in Assessor Data
-Difference in latitude (AirBNB minus Tax Assessor)
-Difference in longitude (AirBNB minus Tax Assessor)
+Max similarity scores of AirBNB Host Name(s) with PartyOwner (1 & 2) first names via WhosWho package*
+Bedrooms on AirBNB listing*
+Bedrooms on AirBNB listing - Bedrooms in Assessor Data*
+Bathrooms on AirBNB listing*
+Bathrooms on AirBNB listing - Bathrooms in Assessor Data*
+Difference in latitude (AirBNB minus Tax Assessor)*
+Difference in longitude (AirBNB minus Tax Assessor)*
 Swimming pool on AirBNB listing
 Swimming pool in tax assessor data
 ```
@@ -41,11 +41,13 @@ Swimming pool in tax assessor data
 
  * I use a fuzzy finder (FuzzyWuzzy) with word ratio scoring to find the most similar listing 'titles' present in both the AirBNB and VRBO/Homeaway data.  Word ratio scoring penalizes heavily for even minor variations -- useful in this context, since I'm looking for very similar listings only.  I keep only those pairs of records with a word ratio score of 50 or better.
 
- * Out of these 429 data points with similar titles, many are automatically discarded via reverse geocoding -- incorrect matches will tend to lie outside of the 500m circle (with a few exceptions).  After applying the geographical constraint, the remaining matches are manually validated by comparing their AirBNB and VRBO/Homeaway URLs.  The intent at this stage is not to predict addresses; it's to be absolutely sure of the locations for the (tiny!) positive class.  Absent a better method for getting 100% accurate address matches to AirBNB, manual validation is essential here.  Perhaps at some point, legally mandated licenses for short term rentals will provide an easier starting point...
+ * Out of these 429 data points with similar titles, many are automatically discarded via reverse geocoding -- incorrect matches will tend to lie outside of the 500m circle (with a few exceptions).  After applying the geographical constraint, the remaining matches are manually validated by comparing their AirBNB and VRBO/Homeaway URLs.  The intent at this stage is not to predict addresses; it's to be absolutely sure of the locations for the (tiny!) positive class.  Absent a better method for getting 100% accurate address matches to AirBNB, manual validation is essential here.  Hopefully, mandatory short term rental licensing will eventually make this step easier, at least in some cities/counties.
+
+    * Reverse geocoding was performed with Google Maps API, using the latitude and longitude provided in the Tax Assessor records. 
 
  * Next, I match these confirmed locations to addresses in the tax assessor data.
 
-    * Approximately 15% of the VRBO/Homeaway addresses cannot be matched to an address in the tax assessor data, even without the 500m proximity restriction.  Perhaps the public records are incomplete.  In some of these cases, the location has been fudged on the VRBO/Homeaway listing to show a nearby business, not a residence.  A better understanding of these discrepancies will be necessary for a deployed model.
+    * Approximately 15% of the VRBO/Homeaway addresses cannot be matched to an address in the tax assessor data, even without the 500m proximity restriction.  In some cases, the location has been fudged on the VRBO/Homeaway listing to show a nearby business, not a residence.  In others, it appears that a valid address is simply missing from the tax assessor data.  A better understanding of these discrepancies will be necessary for a deployed model.
 
 **Negative Class (non-matches):**
 

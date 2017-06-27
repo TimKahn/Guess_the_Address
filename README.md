@@ -1,10 +1,10 @@
 # Address Prediction for AirDNA
 
 ### Overview
-AirDNA has a robust model for predicting the AirBNB revenue potential of a property based on AirBNB rates/occupancy at comparable properties nearby.  As they expand into automated property valuation -- how much is a property actually worth, given its AirBNB revenue potential? -- they need address-specific information for AirBNB rentals in order to compare directly with market data, like MLS listings.
+This project aims to find the exact address of AirBNB listings, or at least, to sufficiently narrow the pool of potential candidates that the problem becomes tractable through a secondary, possibly manual, process.  Why?  AirDNA has an automated valuation model, 'The Rentalizer', that forecasts the revenue potential of a property if it were used as a full-time AirBNB rental.  It currently looks at three nearby properties as 'comps' to provide the forecast, but this method leaves a lot uncertain because it relies only on the information in the AirBNB listing!  AirBNB hosts fudge the numbers for bedrooms and bathrooms; we can't be sure of the square footage, age of the house, size of the yard, proximity to a busy street, etc.  We would feel much more confident in that revenue forecast if it were benchmarked against more reliable property information -- say, from public Tax Assessor records.  And in order to find the correct record, we need the correct address.
 
 ### Challenge / Goal
-AirBNB publishes some basic information in its listings, but not the address -- you only get an address when you book a stay.  Maps on the AirBNB website show the general vicinity of the property as a circle, not as a point; the actual location of the property is randomized within the circle.  My goal is to 'predict' the addresses by comparing features of AirBNB listings to other data (e.g., from county recorder & tax assessor records), and provide a confidence measure for those predictions.  As a starting point, one can confirm a handful of addresses by looking at properties cross-listed on Homeaway/VRBO -- unlike AirBNB, these services show exact map locations for many properties.
+AirBNB publishes some basic information in its listings, but not the address -- you only get an address when you book a stay.  Maps on the AirBNB website show the general vicinity of the property as a circle (see below), not as a point; the actual location of the property is randomized within the circle.  In the case of my Denver dataset, this 500m-radius circle contained an average of 833 properties.  For any given AirBNB listing, only one of those 833 properties correctly matches the listing!  My goal is to 'predict' the addresses by comparing features of AirBNB listings to other data (e.g., from public tax assessor records), and provide a cost-benefit framework for analyzing the results.  As a starting point, we can confirm a handful of AirBNB addresses by looking at properties cross-listed on Homeaway/VRBO -- unlike AirBNB, these services show exact map locations for many properties.
 
 ![AirBNB example map](visualize/air_bnb_map_example.png)
 
@@ -13,7 +13,6 @@ AirBNB publishes some basic information in its listings, but not the address -- 
 * VRBO data that I scraped, including listing title, latitude, and longitude.  VRBO (Vacation Rental By Owner) is a service similar to AirBNB.
 
  * Data was scraped by noting that searching by moving the map generates a JSON object, which in turn specifies the updated map.  Iterate through some parameters in the URL for the JSON, and voila, you've got data for the entire city. See [Ian London's Blog.](https://ianlondon.github.io/blog/web-scraping-discovering-hidden-apis/)
-
 
 * Similar data from Homeaway (VRBO's parent company), provided by AirDNA.
 * Tax assessor records for Denver.

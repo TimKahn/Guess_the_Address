@@ -44,7 +44,7 @@ Swimming pool in tax assessor data
 
  * Out of these 429 data points with similar titles, many are automatically discarded via reverse geocoding -- incorrect matches will tend to lie outside of the 500m circle (with a few exceptions).  After applying the geographical constraint, the remaining matches are manually validated by comparing their AirBNB and VRBO/Homeaway URLs.  The intent at this stage is not to predict addresses; it's to be absolutely sure of the locations for the (tiny!) positive class.  Absent a better method for getting 100% accurate address matches to AirBNB, manual validation is essential here.  Perhaps at some point, legally mandated licenses for short term rentals will provide an easier starting point...
 
- * Next, I match these confirmed locations' addresses to addresses in the tax assessor data.
+ * Next, I match these confirmed locations to addresses in the tax assessor data.
 
     * Approximately 15% of the VRBO/Homeaway addresses cannot be matched to an address in the tax assessor data, even without the 500m proximity restriction.  Perhaps the public records are incomplete.  In some of these cases, the location has been fudged on the VRBO/Homeaway listing to show a nearby business, not a residence.  A better understanding of these discrepancies will be necessary for a deployed model.
 
@@ -52,23 +52,38 @@ Swimming pool in tax assessor data
 
  * I keep every property in the tax assessor data located within 500m of one of the matches.  This generates hundreds of non-matched (negative class) examples for every match; an average of 833 'non-matches' per match!
 
-#### An interesting discovery -- distances of the true addresses from the center of the circle (meters):
+#### An interesting discovery -- distances of the true addresses from the center of the circle (in meters):
 
 ![Distance (km) between center of circle and true address:](visualize/distance_2d.png)
 
-Distance from the center of the circle is clearly not distributed uniformly within the 500m radius.  Distance looks like a promising predictor.
+Distance from the center of the circle is clearly not distributed uniformly within the 500m radius.  This is a promising model feature.
 
 ### Model Selection
 
-* Given the severely imbalanced classes, I favor recall over precision (at least to a point), essentially mimicking fraud detection: even if I have many false positives for every true positive, I've turned a needle-in-a-haystack (1-in-833) problem into a problem that could be reasonably and affordably solved by manual process.  An initial attempt at a manual process (no modeling involved) by AirDNA identified 30% of properties in a sample, so we'll treat 30% as the baseline for recall.
+* Given the severely imbalanced classes, I favor recall over precision (at least to a point), essentially mimicking fraud detection: even if I have many false positives for every true positive, I've turned a needle-in-a-haystack (1-in-833) problem into a problem that could be reasonably and affordably solved by manual process.  An initial attempt at a manual process (no modeling involved) by AirDNA identified 30% of properties in a sample, so we'll treat 30% as the baseline for recall.  ROC and profit curves will be crucial for fine-tuning, as slight increases in recall may result in large decreases in precision.
 
 * Random Forest, SVMs, and Gaussian Naive Bayes were ineffective, even with random over- and undersampling, SMOTE, Tomek Link removal, ENN, and combinations thereof.  The best AUC achieved was .78.
 
-* AdaBoost was better, offering AUC from .85 to .9 depending on hyperparameters and under/over-sampling techniques.
-
-* XGBoost and Blagging (balanced-bootrap + bagging; specifically, Balanced Random Forest) were the best models, with AUC approaching .92.  Discussion of Blagging and other methods for imbalanced classes can be found [here][IC1].
+* AdaBoost was better, with AUC ranging from .85 to .9 depending on hyperparameters and under/over-sampling techniques.
 
 * Outlier detection: Isolation Forest and Elliptic Envelope were ineffective.  It appears that most of the matches are not outliers, but that Blagging and XGBoost successfully identify a subset of the data where the matches are most likely to occur.
+
+* XGBoost and Blagging (balanced-bootstrap + bagging; specifically, Balanced Random Forest) were the best models, with AUC approaching .92.  Discussion of Blagging and other methods for imbalanced classes can be found [here][IC1].
+
+* Stacking XGBoost with Blagging did not improve model performance.
+
+### Analysis of Best Models:
+
+#### ROC Curves: Blagging (Balanced Random Forest) and XGBoost
+![ROC curves:](visualize/best_roc2.png)
+
+Note that performance is nearly identical up to ~75% recall.  Let's analyze the XGBoost model in-depth:
+
+#### True Positive to False Positive ratios: XGBoost
+![Benchmarked ROC curve: XGBoost](visualize/roc_xg_benchmarked.png)
+
+I've plotted points corresponding to two False-Positive/True-Positive ratios above.  Note that the 42:1 ratio gets us better than 50% recall, but we must accept a significant increase in the ratio (68:1) to surpass 75% recall.  Clearly, the model is much better than random, and either benchmark represents a model threshold that discards over 90% of the negative class.  However, the ultimate proportion of addresses identified will depend on a different process, and if that process is manual (say, comparing photos), its cost will be crucial in determining what false-to-true-positive ratio we can accept.
+
 
 ## Resources and References
 

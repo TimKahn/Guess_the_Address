@@ -85,8 +85,8 @@ def plot_avg_profits(classifier, filename, n_splits=5, revenue=20, cost=.25):
     max_idx = avg_profits.argmax()
     print('Max profit: {}'.format(avg_profits[max_idx]))
     ax1.scatter(thresholds[max_idx], avg_profits[max_idx], color='yellow', zorder=2) #max profit point
-    ax1.annotate('Maximum profit: ${}'.format(int(avg_profits[max_idx])), (thresholds[max_idx], avg_profits[max_idx]), xytext=(5, 5), textcoords='offset points', fontsize=14)
-    ax1.plot(thresholds, avg_profits, color='cyan', linewidth=1.4, zorder=1)
+    ax1.annotate('Maximum profit: ${}'.format(int(avg_profits[max_idx])), (thresholds[max_idx], avg_profits[max_idx]), xytext=(8, 3), textcoords='offset points', fontsize=14)
+    ax1.plot(thresholds, avg_profits, color='blue', linewidth=1.4, zorder=1)
     ax1.axhline(y=0, color='red', linestyle='--')
     ax1.spines['bottom'].set_color('grey')
     ax1.xaxis.label.set_color('grey')
@@ -101,7 +101,7 @@ def plot_avg_profits(classifier, filename, n_splits=5, revenue=20, cost=.25):
     plt.xlim([.05, 1])
     plt.ylim([-10000, 50000])
     # plt.tight_layout()
-    plt.savefig('../visualize/profit3.png', dpi=600, bbox_inches='tight', transparent=False)
+    plt.savefig('../visualize/profit3.png', dpi=600, bbox_inches='tight', transparent=True)
     # plt.show()
     return
 

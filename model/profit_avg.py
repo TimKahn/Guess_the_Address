@@ -99,10 +99,10 @@ def plot_avg_profits(classifier, filename, n_splits=5, revenue=20, cost=.25):
     plt.xlabel("Model Threshold")
     plt.ylabel("US Dollars")
     plt.xlim([.05, 1])
-    plt.ylim([-10000, 50000])
+    plt.ylim([-10000, 175000])
     # plt.tight_layout()
-    plt.savefig('../visualize/profit3.png', dpi=600, bbox_inches='tight', transparent=True)
-    # plt.show()
+    # plt.savefig('../visualize/profit3.png', dpi=600, bbox_inches='tight', transparent=True)
+    plt.show()
     return
 
 if __name__ == '__main__':

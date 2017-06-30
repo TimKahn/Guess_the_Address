@@ -74,7 +74,7 @@ def plot_PR_curve(classifier, X, y, n_folds=5):
 
 if __name__ == '__main__':
     plt.close('all')
-    X, y = split.get_xy()
+    X, y = split.get_xy('../data/featurized_500.csv')
     adb = AdaBoostClassifier(n_estimators=200, learning_rate=.2, random_state=42)
     bc = BlaggingClassifier(base_estimator=DecisionTreeClassifier(criterion='entropy', max_features=.6),n_estimators=200, random_state=42, n_jobs=-1)
     # plot_ROC_curve(bc, X_train, y_train)

@@ -41,8 +41,8 @@ def get_features(df):
     featurized_df['neighbor_count'] = df.loc[:, 'neighbor_count']
     featurized_df['lat_offset'] = df.loc[:, 'latitude'] - df.loc[:, 'PropertyLatitude']
     featurized_df['lon_offset'] = df.loc[:, 'longitude'] - df.loc[:, 'PropertyLongitude']
-    featurized_df['fireplace_a'] = df['indoor_fireplace'].apply(lambda x: 1 if x == True else 0)
-    featurized_df['fireplace_t'] = df['Fireplace'].apply(lambda x: 1 if x == 1.0 else 0)
+    # featurized_df['fireplace_a'] = df['indoor_fireplace'].apply(lambda x: 1 if x == True else 0)
+    # featurized_df['fireplace_t'] = df['Fireplace'].apply(lambda x: 1 if x == 1.0 else 0)
     featurized_df['beds_a'] = df.loc[:, 'bedrooms'].fillna(0)
     featurized_df['bed_diff'] = df.loc[:, 'bedrooms'] - df.loc[:, 'BedroomsCount'].fillna(0).apply(lambda x: max(x, 10))
     featurized_df['baths_a'] = df.loc[:, 'bathrooms'].fillna(0)
@@ -53,6 +53,6 @@ def get_features(df):
     return featurized_df
 
 if __name__ == '__main__':
-    df = pd.read_csv('../data/merged_200.csv', low_memory=False)
+    df = pd.read_csv('../data/merged_500.csv', low_memory=False)
     featurized_df = get_features(df)
-    featurized_df.to_csv('../data/featurized_200.csv')
+    featurized_df.to_csv('../data/featurized_500.csv')
